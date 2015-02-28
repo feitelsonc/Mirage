@@ -55,14 +55,12 @@ public class HealthInformationSystem {
 	
 	/** The name of the table we are testing with */
 	public static final String TableNamePatient = "Patient";
-	public static final String TableNameGuardianOf = "Guardian_Of";
 	public static final String TableNameGuardian = "Guardian";
 	public static final String TableNameLabTestReportOf = "Lab_Test_Report_Of";
 	public static final String TableNameFamilyMemberOfPatient = "Family_Member_Of_Patient";
 	public static final String TableNameAuthor = "Author";
 	public static final String TableNameAssignedTo = "Assigned_To";
 	public static final String TableNameInsurance = "Insurance";
-	public static final String TableNameInsuredBy = "Insured_By";
 	public static final String TableNameSubstance = "Substance";
 	public static final String TableNameAllergicTo = "Allergic_To";
 	public static final String TableNamePlanScheduledFor = "Plan_Scheduled_For";
@@ -137,9 +135,7 @@ public class HealthInformationSystem {
 	 */
 	public void initializeDB() {
 
-		String createTable, alterTable;
-		
-		Statement stmt;
+		String createTable;
 		
 		// Connect to MySQL
 		Connection conn = null;
@@ -148,6 +144,45 @@ public class HealthInformationSystem {
 			System.out.println("Connected to database");
 		} catch (SQLException e) {
 			System.out.println("ERROR: Could not connect to the database");
+			e.printStackTrace();
+			return;
+		}
+		
+		
+		//TODO: Add delete constraints example: CASCADE
+		
+		// Create table Insurance
+		try {
+			createTable = "CREATE TABLE " + TableNameInsurance + " ( " +
+					"PayerId CHAR(20), " +
+					"Name CHAR(20), " +
+					"PRIMARY KEY (PayerId)" +
+					")";
+		    this.executeUpdate(conn, createTable);
+			System.out.println("Created table " + TableNameInsurance);
+	    } catch (SQLException e) {
+			System.out.println("ERROR: Could not create the table " + TableNameInsurance);
+			e.printStackTrace();
+			return;
+		}
+		
+		// Create table Guardian
+		try {
+			createTable = "CREATE TABLE " + TableNameGuardian + " ( " +
+					"GuardianNo CHAR(20), " +
+					"Phone CHAR(20), " +
+					"Address CHAR(20), " +
+					"State CHAR(20), " +
+					"GivenName CHAR(20), " +
+					"FamilyName CHAR(20), " +
+					"City CHAR(20), " +
+					"Zip CHAR(20), " +
+					"PRIMARY KEY (GuardianNo) " +
+					")";
+			this.executeUpdate(conn, createTable);
+			System.out.println("Created table " + TableNameGuardian);
+		} catch (SQLException e) {
+			System.out.println("ERROR: Could not create the table " + TableNameGuardian);
 			e.printStackTrace();
 			return;
 		}
@@ -165,50 +200,17 @@ public class HealthInformationSystem {
 		    		"xmlHealthCreationDateTime CHAR(20), " +
 		    		"GuardianNo CHAR(20) NOT NULL, " +
 		    		"PayerId CHAR(20) NOT NULL, " +
-		    		"PRIMARY KEY (PatientId)" +
+		    		"PatientRole CHAR(20) NOT NULL, " +
+		    		"PolicyType CHAR(20) NOT NULL, " +
+		    		"Purpose CHAR(20) NOT NULL, " +
+		    		"PRIMARY KEY (PatientId), " +
+		    		"FOREIGN KEY (GuardianNo) REFERENCES Guardian (GuardianNo), " +
+		    		"FOREIGN KEY (PayerId) REFERENCES Insurance (PayerId)" +
 		    		")";
 		    this.executeUpdate(conn, createTable);
 			System.out.println("Created table " + TableNamePatient);
 	    } catch (SQLException e) {
 			System.out.println("ERROR: Could not create the table " + TableNamePatient);
-			e.printStackTrace();
-			return;
-		}
-		
-		
-		// Create table GuardianOf
-		try {
-			createTable = "CREATE TABLE " + TableNameGuardianOf + " ( " +
-		    		"PatientId CHAR(20) NOT NULL, " +
-		    		"GuardianNo CHAR(20) NOT NULL, " +
-		    		"PRIMARY KEY (PatientId, GuardianNo) " +
-		    		")";
-		    this.executeUpdate(conn, createTable);
-			System.out.println("Created table " + TableNameGuardianOf);
-	    } catch (SQLException e) {
-			System.out.println("ERROR: Could not create the table " + TableNameGuardianOf);
-			e.printStackTrace();
-			return;
-		}
-		
-		// Create table Guardian
-		try {
-			createTable = "CREATE TABLE " + TableNameGuardian + " ( " +
-					"GuardianNo CHAR(20), " +
-					"PatientRole CHAR(20), " +
-					"Phone CHAR(20), " +
-					"Address CHAR(20), " +
-					"State CHAR(20), " +
-					"GivenName CHAR(20), " +
-					"FamilyName CHAR(20), " +
-					"City CHAR(20), " +
-					"Zip CHAR(20), " +
-					"PRIMARY KEY (GuardianNo) " +
-					")";
-			this.executeUpdate(conn, createTable);
-			System.out.println("Created table " + TableNameGuardian);
-		} catch (SQLException e) {
-			System.out.println("ERROR: Could not create the table " + TableNameGuardian);
 			e.printStackTrace();
 			return;
 		}
@@ -285,40 +287,6 @@ public class HealthInformationSystem {
 			System.out.println("Created table " + TableNameAssignedTo);
 	    } catch (SQLException e) {
 			System.out.println("ERROR: Could not create the table " + TableNameAssignedTo);
-			e.printStackTrace();
-			return;
-		}
-		
-		// Create table Insurance
-		try {
-			createTable = "CREATE TABLE " + TableNameInsurance + " ( " +
-					"PayerId CHAR(20), " +
-					"Name CHAR(20), " +
-					"PRIMARY KEY (PayerId)" +
-					")";
-		    this.executeUpdate(conn, createTable);
-			System.out.println("Created table " + TableNameInsurance);
-	    } catch (SQLException e) {
-			System.out.println("ERROR: Could not create the table " + TableNameInsurance);
-			e.printStackTrace();
-			return;
-		}
-		
-		// Create table InsuredBy
-		try {
-			createTable = "CREATE TABLE " + TableNameInsuredBy + " ( " +
-					"PatientId CHAR(20) NOT NULL, " +
-					"PayerId CHAR(20) NOT NULL, " +
-					"PolicyType CHAR(20), " +
-					"Purpose CHAR(20), " +
-					"PRIMARY KEY (PatientId, PayerId), " +
-					"FOREIGN KEY (PayerId) REFERENCES Insurance (PayerId), " +
-					"FOREIGN KEY (PatientId) REFERENCES Patient (PatientId) " +
-					")";
-			this.executeUpdate(conn, createTable);
-			System.out.println("Created table " + TableNameInsuredBy);
-		} catch (SQLException e) {
-			System.out.println("ERROR: Could not create the table " + TableNameInsuredBy);
 			e.printStackTrace();
 			return;
 		}
