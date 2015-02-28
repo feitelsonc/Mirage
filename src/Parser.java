@@ -1,22 +1,20 @@
 import java.io.IOException;
-
-import javax.xml.parsers.*;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-
 public class Parser {
 	
-	public static void main() {
+	public static void execute() {
 		try {
 			Connection con = null;
 			Statement st = null;
