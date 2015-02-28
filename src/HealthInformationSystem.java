@@ -4,56 +4,24 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-/**
- * This class demonstrates how to connect to MySQL and run some basic commands.
- * 
- * In order to use this, you have to download the Connector/J driver and add
- * its .jar file to your build path.  You can find it here:
- * 
- * http://dev.mysql.com/downloads/connector/j/
- * 
- * You will see the following exception if it's not in your class path:
- * 
- * java.sql.SQLException: No suitable driver found for jdbc:mysql://localhost:3306/
- * 
- * To add it to your class path:
- * 1. Right click on your project
- * 2. Go to Build Path -> Add External Archives...
- * 3. Select the file mysql-connector-java-5.1.24-bin.jar
- *    NOTE: If you have a different version of the .jar file, the name may be
- *    a little different.
- *    
- * The user name and password are both "root", which should be correct if you followed
- * the advice in the MySQL tutorial. If you want to use different credentials, you can
- * change them below. 
- * 
- * You will get the following exception if the credentials are wrong:
- * 
- * java.sql.SQLException: Access denied for user 'userName'@'localhost' (using password: YES)
- * 
- * You will instead get the following exception if MySQL isn't installed, isn't
- * running, or if your serverName or portNumber are wrong:
- * 
- * java.net.ConnectException: Connection refused
- */
 public class HealthInformationSystem {
 
-	/** The name of the MySQL account to use (or empty for anonymous) */
+	// The name of the MySQL account to use (or empty for anonymous)
 	private final String userName = "root";
 
-	/** The password for the MySQL account (or empty for anonymous) */
+	// The password for the MySQL account (or empty for anonymous)
 	private final String password = "";
 
-	/** The name of the computer running MySQL */
+	// The name of the computer running MySQL
 	private final String serverName = "localhost";
 
-	/** The port of the MySQL server (default is 3306) */
+	// The port of the MySQL server (default is 3306)
 	private final int portNumber = 3306;
 
-	/** The name of the database we are testing with (this default is installed with MySQL) */
+	// The name of the database we are testing with (this default is installed with MySQL)
 	public static final String dbName = "HealthInformationSystem";
 	
-	/** The name of the table we are testing with */
+	// The name of the tables we are testing with
 	public static final String TableNamePatient = "Patient";
 	public static final String TableNameGuardian = "Guardian";
 	public static final String TableNameLabTestReportOf = "Lab_Test_Report_Of";
@@ -66,12 +34,7 @@ public class HealthInformationSystem {
 	public static final String TableNamePlanScheduledFor = "Plan_Scheduled_For";
 
 	
-	/**
-	 * Get a new database connection
-	 * 
-	 * @return
-	 * @throws SQLException
-	 */
+	// Creates HealthInformationSystem database and returns connection to it. Throws SQLException if creation of HealthInformationSystem fails
 	public Connection getConnection() throws SQLException {
 		Connection conn = null;
 		String initDB;
@@ -84,11 +47,13 @@ public class HealthInformationSystem {
 				connectionProps);
 		
 		try {
+			// Attempt to create HealthInformationSystem database
 			initDB = "CREATE DATABASE " + dbName;
 		    this.executeUpdate(conn, initDB);
 			System.out.println("Created Database");
 		} catch (SQLException e) {
 			System.out.println(dbName + " Exists");
+			// Creation of HealthInformationSystem database failed because it already exists so delete the existing HealthInformationSystem and create a new one
 			try {
 				initDB = "DROP DATABASE " + dbName;
 			    this.executeUpdate(conn, initDB);
@@ -97,6 +62,7 @@ public class HealthInformationSystem {
 			    this.executeUpdate(conn, initDB);
 				System.out.println("Created Database");
 			} catch (SQLException e2) {
+				// Creation of new HealthInformationSystem database failed so throw error
 				System.out.println("ERROR: FAILED TO DROP OR CREATE DATABASE: " + dbName);
 				e.printStackTrace();
 				throw new SQLException();
@@ -107,16 +73,10 @@ public class HealthInformationSystem {
 				+ this.serverName + ":" + this.portNumber + "/" + dbName,
 				connectionProps);
 
-
 		return conn;
 	}
 
-	/**
-	 * Run a SQL command which does not return a recordset:
-	 * CREATE/INSERT/UPDATE/DELETE/DROP/etc.
-	 * 
-	 * @throws SQLException If something goes wrong
-	 */
+	// Method to execute a SQL statement
 	public boolean executeUpdate(Connection conn, String command) throws SQLException {
 	    Statement stmt = null;
 	    try {
@@ -124,15 +84,12 @@ public class HealthInformationSystem {
 	        stmt.executeUpdate(command); // This will throw a SQLException if it fails
 	        return true;
 	    } finally {
-
 	    	// This will run whether we throw an exception or not
 	        if (stmt != null) { stmt.close(); }
 	    }
 	}
 	
-	/**
-	 * Connect to MySQL and do some stuff.
-	 */
+	// Creates all tables in HealthInformationSystem database
 	public void initializeDB() {
 
 		String createTable;
@@ -341,52 +298,9 @@ public class HealthInformationSystem {
 			return;
 		}
 		
-		/******************************************************************************/
-
-		
-//		// Add Foreign Key Constraints Patient
-//		try {
-//			
-//			alterTable = "ALTER TABLE " + TableNamePatient + " ADD CONSTRAINT fk_GuardianNo FOREIGN KEY (GuardianNo) REFERENCES Guardian_Of (GuardianNo)";
-////					"ADD FOREIGN KEY (PayerId) REFERENCES Insured_By (PayerId)";
-//			this.executeUpdate(conn, alterTable);
-//			System.out.println("Updated table " + TableNamePatient);
-//		} catch (SQLException e) {
-//			System.out.println("ERROR: Could not update the table " + TableNamePatient);
-//			e.printStackTrace();
-//			return;
-//		}
-//		
-//		// Add Foreign Key Constraints GuardianOf
-//		try {
-//			stmt = conn.createStatement();
-//			alterTable = "ALTER TABLE " + TableNameGuardianOf + " " +
-//		    		"ADD FOREIGN KEY (PatientId) REFERENCES Patient (PatientId), " +
-//		    		"ADD FOREIGN KEY (GuardianNo) REFERENCES Guardian (GuardianNo)";
-//			stmt.execute(alterTable);
-//			System.out.println("Updated table " + TableNameGuardianOf);
-//		} catch (SQLException e) {
-//			System.out.println("ERROR: Could not update the table " + TableNameGuardianOf);
-//			e.printStackTrace();
-//			return;
-//		}
-
-		
-//		// Drop the table
-//		try {
-//		    String dropString = "DROP TABLE " + this.tableName;
-//			this.executeUpdate(conn, dropString);
-//			System.out.println("Dropped the table");
-//	    } catch (SQLException e) {
-//			System.out.println("ERROR: Could not drop the table");
-//			e.printStackTrace();
-//			return;
-//		}
 	}
 	
-	/**
-	 * Connect to the DB and do some stuff
-	 */
+	// Entry point into program
 	public static void main(String[] args) {
 		HealthInformationSystem app = new HealthInformationSystem();
 		app.initializeDB();
