@@ -148,8 +148,8 @@ public class Parser {
 				PlanId = rs.getString("PlanId");
 				Activity = rs.getString("Activity");
 				ScheduledDate = rs.getString("ScheduledDate");
-				suffix = rs.getString("suffix");
-				gender = rs.getString("gender");
+//				suffix = rs.getString("suffix");
+//				gender = rs.getString("gender");
 
 				if(PayerId!=null) {
 					insurance = new Insurance(PayerId, Name);
@@ -160,7 +160,7 @@ public class Parser {
 				}
 
 				if(patientId!=null) {
-					patient = new Patient(patientId, FamilyName, GivenName, suffix, BirthTime, gender, providerId, Last_Accessed, GuardianNo, PayerId, Relationship, PolicyType, PolicyHolder, Purpose);
+					patient = new Patient(patientId, FamilyName, GivenName, null, BirthTime, null, providerId, Last_Accessed, GuardianNo, PayerId, Relationship, PolicyType, PolicyHolder, Purpose);
 				}
 
 				if(LabTestResultId!=null)
@@ -188,6 +188,7 @@ public class Parser {
 
 				if(Id!=null && patientId!=null) {
 					allergicTo = new AllergicTo(Reaction, Status, Id, patientId);
+					insertAllergicTo(allergicTo, connHealth);
 				}
 
 				if(PlanId!=null) {
@@ -199,5 +200,84 @@ public class Parser {
 			e.printStackTrace();
 		}
 	}
+	
+	// Method to execute a SQL statement
+	private static boolean executeUpdate(Connection conn, String command) throws SQLException {
+		Statement stmt = null;
+		try {
+			stmt = conn.createStatement();
+			stmt.executeUpdate(command); // This will throw a SQLException if it fails
+			return true;
+		} finally {
+			// This will run whether we throw an exception or not
+			if (stmt != null) { stmt.close(); }
+		}
+	}
+	
+	private static void insertAllergicTo(AllergicTo allergicTo, Connection conn) {
+		String Reaction = "NULL";
+		String Active = "NULL";
+		String SubstanceId = "NULL";
+		String PatientId = "NULL";
+		
+		if (allergicTo.Reaction != null) {
+			Reaction = allergicTo.Reaction;
+		}
+		if (allergicTo.Active != null) {
+			Active = allergicTo.Active;
+		}
+		if (allergicTo.SubstanceId != null) {
+			SubstanceId = allergicTo.SubstanceId;
+		}
+		if (allergicTo.PatientId != null) {
+			PatientId = allergicTo.PatientId;
+		}
+		
+		String insertMessage = "INSERT INTO `" + HealthInformationSystem.TableNameAllergicTo + " VALUES ('" +Reaction+ "','" +Active+ "','" +SubstanceId+ "','" +PatientId+ "')";
+		System.out.println(insertMessage);
+		try {
+			executeUpdate(conn, insertMessage);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private static void insertAssignedTo(AssignedTo assignedTo, Connection conn) {
+		
+	}
+	
+	private static void insertAuthor(Author author, Connection conn) {
+		
+	}
+	
+	private static void insertFamilyMember(FamilyMember familyMember, Connection conn) {
+		
+	}
+	
+	private static void insertGuardian(Guardian guardian, Connection conn) {
+		
+	}
+	
+	private static void insertInsurance(Insurance insurance, Connection conn) {
+		
+	}
+	
+	private static void insertLabTestReport(LabTestReport labTestReport, Connection conn) {
+		
+	}
+	
+	private static void insertPatient(Patient patient, Connection conn) {
+		
+	}
+	
+	private static void insertPlanScheduledFor(PlanScheduledFor planScheduledFor, Connection conn) {
+		
+	}
+	
+	private static void insertSubstance(Substance substance, Connection conn) {
+		
+	}
+	
 }
 
