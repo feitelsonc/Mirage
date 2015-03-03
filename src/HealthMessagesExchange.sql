@@ -1,8 +1,8 @@
-CREATE DATABASE  IF NOT EXISTS `healthmessagesexchange2` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `healthmessagesexchange2`;
+CREATE DATABASE  IF NOT EXISTS `healthmessagesexchange` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `healthmessagesexchange`;
 -- MySQL dump 10.13  Distrib 5.6.17, for Win32 (x86)
 --
--- Host: localhost    Database: healthmessagesexchange2
+-- Host: localhost    Database: healthmessagesexchange
 -- ------------------------------------------------------
 -- Server version	5.7.5-m15-log
 

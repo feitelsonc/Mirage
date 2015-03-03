@@ -7,16 +7,16 @@ import java.util.Properties;
 public class HealthInformationSystem {
 
 	// The name of the MySQL account to use (or empty for anonymous)
-	private final String userName = "root";
+	public static final String userName = "root";
 
 	// The password for the MySQL account (or empty for anonymous)
-	private final String password = "";
+	public static final String password = "";
 
 	// The name of the computer running MySQL
-	private final String serverName = "localhost";
+	public static final String serverName = "localhost";
 
 	// The port of the MySQL server (default is 3306)
-	private final int portNumber = 3306;
+	public static final int portNumber = 3306;
 
 	// The name of the database we are testing with (this default is installed with MySQL)
 	public static final String dbName = "HealthInformationSystem";
@@ -113,7 +113,7 @@ public class HealthInformationSystem {
 		try {
 			createTable = "CREATE TABLE " + TableNameInsurance + " ( " +
 					"PayerId varchar(100), " +
-					"Name varchar(100), " +
+					"Name varchar(100) DEFAULT NULL, " +
 					"PRIMARY KEY (PayerId)" +
 					")";
 		    this.executeUpdate(conn, createTable);
@@ -128,13 +128,13 @@ public class HealthInformationSystem {
 		try {
 			createTable = "CREATE TABLE " + TableNameGuardian + " ( " +
 					"GuardianNo varchar(100), " +
-					"Phone varchar(100), " +
-					"Address varchar(100), " +
-					"State varchar(100), " +
-					"GivenName varchar(100), " +
-					"FamilyName varchar(100), " +
-					"City varchar(100), " +
-					"Zip varchar(100), " +
+					"Phone varchar(100) DEFAULT NULL, " +
+					"Address varchar(100) DEFAULT NULL, " +
+					"State varchar(100) DEFAULT NULL, " +
+					"GivenName varchar(100) DEFAULT NULL, " +
+					"FamilyName varchar(100) DEFAULT NULL, " +
+					"City varchar(100) DEFAULT NULL, " +
+					"Zip varchar(100) DEFAULT NULL, " +
 					"PRIMARY KEY (GuardianNo) " +
 					")";
 			this.executeUpdate(conn, createTable);
@@ -149,13 +149,13 @@ public class HealthInformationSystem {
 		try {
 			createTable = "CREATE TABLE " + TableNamePatient + " ( " +
 			        "PatientId varchar(100), " +
-		    		"FamilyName varchar(100), " +
-			        "GivenName varchar(100), " +
-		    		"Suffix varchar(100), " +
-		    		"BirthTime varchar(100), " +
-		    		"Gender varchar(100), " +
-		    		"ProviderId varchar(100), " +
-		    		"xmlHealthCreationDateTime varchar(100), " +
+		    		"FamilyName varchar(100) DEFAULT NULL, " +
+			        "GivenName varchar(100) DEFAULT NULL, " +
+		    		"Suffix varchar(100) DEFAULT NULL, " +
+		    		"BirthTime varchar(100) DEFAULT NULL, " +
+		    		"Gender varchar(100) DEFAULT NULL, " +
+		    		"ProviderId varchar(100) DEFAULT NULL, " +
+		    		"xmlHealthCreationDateTime varchar(100) DEFAULT NULL, " +
 		    		"GuardianNo varchar(100) NOT NULL, " +
 		    		"PayerId varchar(100) NOT NULL, " +
 		    		"PatientRole varchar(100) NOT NULL, " +
@@ -178,12 +178,12 @@ public class HealthInformationSystem {
 		try {
 			createTable = "CREATE TABLE " + TableNameLabTestReportOf + " ( " +
 					"LabTestResultId varchar(100), " +
-					"LabTestType varchar(100), " +
-					"ReferenceRangeHigh varchar(100), " +
-					"PatientVisitId varchar(100), " +
-					"LabTestPerformedDate varchar(100), " +
-					"TestResultValue varchar(100), " +
-					"ReferenceRangeLow varchar(100), " +
+					"LabTestType varchar(100) DEFAULT NULL, " +
+					"ReferenceRangeHigh varchar(100) DEFAULT NULL, " +
+					"PatientVisitId varchar(100) DEFAULT NULL, " +
+					"LabTestPerformedDate varchar(100) DEFAULT NULL, " +
+					"TestResultValue varchar(100) DEFAULT NULL, " +
+					"ReferenceRangeLow varchar(100) DEFAULT NULL, " +
 					"PatientId varchar(100) NOT NULL, " +
 					"PRIMARY KEY (LabTestResultId), " +
 					"FOREIGN KEY (PatientId) REFERENCES Patient (PatientId) " +
@@ -200,9 +200,9 @@ public class HealthInformationSystem {
 		try {
 			createTable = "CREATE TABLE " + TableNameFamilyMemberOfPatient + " ( " +
 					"Id varchar(100), " +
-					"Age varchar(100), " +
-					"Relationship varchar(100), " +
-					"Diagnosis varchar(100), " +
+					"Age varchar(100) DEFAULT NULL, " +
+					"Relationship varchar(100) DEFAULT NULL, " +
+					"Diagnosis varchar(100) DEFAULT NULL, " +
 					"PatientId varchar(100) NOT NULL, " +
 					"PRIMARY KEY (Id, PatientId), " +
 					"FOREIGN KEY (PatientId) REFERENCES Patient (PatientId) " +
@@ -219,9 +219,9 @@ public class HealthInformationSystem {
 		try {
 			createTable = "CREATE TABLE " + TableNameAuthor + " ( " +
 					"AuthorId varchar(100), " +
-					"AuthorFirstName varchar(100), " +
-					"AuthorTitle varchar(100), " +
-					"AuthorLastName varchar(100), " +
+					"AuthorFirstName varchar(100) DEFAULT NULL, " +
+					"AuthorTitle varchar(100) DEFAULT NULL, " +
+					"AuthorLastName varchar(100) DEFAULT NULL, " +
 					"PRIMARY KEY (AuthorId) " +
 					")";
 		    this.executeUpdate(conn, createTable);
@@ -237,7 +237,7 @@ public class HealthInformationSystem {
 			createTable = "CREATE TABLE " + TableNameAssignedTo + " ( " +
 					"AuthorId varchar(100) NOT NULL, " +
 					"PatientId varchar(100) NOT NULL, " +
-					"ParticipatingRole varchar(100), " +
+					"ParticipatingRole varchar(100) DEFAULT NULL, " +
 					"PRIMARY KEY (AuthorId, PatientId), " +
 					"FOREIGN KEY (AuthorId) REFERENCES Author (AuthorId), " +
 					"FOREIGN KEY (PatientId) REFERENCES Patient (PatientId)" +
@@ -254,7 +254,7 @@ public class HealthInformationSystem {
 		try {
 			createTable = "CREATE TABLE " + TableNameSubstance + " ( " +
 					"SubstanceId varchar(100), " +
-					"SubstanceName varchar(100), " +
+					"SubstanceName varchar(100) DEFAULT NULL, " +
 					"PRIMARY KEY (SubstanceId)" +
 					")";
 			this.executeUpdate(conn, createTable);
@@ -268,8 +268,8 @@ public class HealthInformationSystem {
 		// Create table AllergicTo
 		try {
 			createTable = "CREATE TABLE " + TableNameAllergicTo + " ( " +
-					"Reaction varchar(100), " +
-					"Active varchar(100), " +
+					"Reaction varchar(100) DEFAULT NULL, " +
+					"Active varchar(100) DEFAULT NULL, " +
 					"SubstanceId varchar(100) NOT NULL, " +
 					"PatientId varchar(100) NOT NULL, " +
 					"PRIMARY KEY (SubstanceId, PatientId), " +
@@ -436,5 +436,6 @@ public class HealthInformationSystem {
 	public static void main(String[] args) {
 		HealthInformationSystem app = new HealthInformationSystem();
 		app.initializeDB();
+		Parser.execute();
 	}
 }
