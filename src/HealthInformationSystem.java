@@ -159,6 +159,7 @@ public class HealthInformationSystem {
 		    		"PayerId CHAR(20) NOT NULL, " +
 		    		"PatientRole CHAR(20) NOT NULL, " +
 		    		"PolicyType CHAR(20) NOT NULL, " +
+		    		"PolicyHolder CHAR(20) NOT NULL, " +
 		    		"Purpose CHAR(20) NOT NULL, " +
 		    		"PRIMARY KEY (PatientId), " +
 		    		"FOREIGN KEY (GuardianNo) REFERENCES Guardian (GuardianNo), " +
@@ -179,7 +180,7 @@ public class HealthInformationSystem {
 					"LabTestType CHAR(20), " +
 					"ReferenceRangeHigh CHAR(20), " +
 					"PatientVisitId CHAR(20), " +
-					"LabTestPerfromedDate CHAR(20), " +
+					"LabTestPerformedDate CHAR(20), " +
 					"TestResultValue CHAR(20), " +
 					"ReferenceRangeLow CHAR(20), " +
 					"PatientId CHAR(20) NOT NULL, " +
@@ -252,6 +253,7 @@ public class HealthInformationSystem {
 		try {
 			createTable = "CREATE TABLE " + TableNameSubstance + " ( " +
 					"SubstanceId CHAR(20), " +
+					"SubstanceName CHAR(20), " +
 					"PRIMARY KEY (SubstanceId)" +
 					")";
 			this.executeUpdate(conn, createTable);
@@ -284,10 +286,11 @@ public class HealthInformationSystem {
 		// Create table PlanScheduledFor
 		try {
 			createTable = "CREATE TABLE " + TableNamePlanScheduledFor + " ( " +
+					"PlanId CHAR(20) NOT NULL, " +
 					"PlanName CHAR(20) NOT NULL, " +
 					"PatientId CHAR(20) NOT NULL, " +
 					"DateScheduled CHAR(20) NOT NULL, " +
-					"PRIMARY KEY (PlanName, PatientId, DateScheduled), " +
+					"PRIMARY KEY (PlanId), " +
 					"FOREIGN KEY (PatientId) REFERENCES Patient (PatientId) " +
 					")";
 			this.executeUpdate(conn, createTable);
