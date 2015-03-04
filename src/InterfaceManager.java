@@ -140,5 +140,43 @@ public class InterfaceManager {
 	
 		
 	}
+	
+	private static void processAdminOp2(Connection con) {
+		
+		try {
+			Statement st = null;
+			ResultSet rs = null;
+			String patientId;
+			String SubstanceName;
+			String GivenName;
+			
+			String query =
+					"SELECT DISTINCT P.patientId, P.GivenName" +
+					"FROM Patient P, Allergic_To A" +
+					"WHERE P.patientId = A.patientId" +
+					"GROUP BY P.patientId " +
+					"HAVING COUNT(*)>1";
+			
+			st = con.createStatement();
+			rs = st.executeQuery(query);
+			
+			//TODO: if rs is empty set what is returned
+			
+			while(rs.next()) {
+				patientId = rs.getString("patientId");
+				GivenName = rs.getString("GivenName");
+				
+				
+				System.out.println("Patient Id: " + patientId + ", with the GivenName: " + GivenName + ", has more than one allergy");
+				
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		
+	
+		
+	}
 
 }
