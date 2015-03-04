@@ -90,6 +90,7 @@ public class InterfaceManager {
 				}
 				else if (in.equals("2") || in.equals("(2)")) {
 					invalidInput = false;
+					processAdminOp2(con);
 				}
 				else if (in.equals("3") || in.equals("(3)")) {
 					invalidInput = false;
@@ -116,8 +117,8 @@ public class InterfaceManager {
 			String SubstanceName;
 			
 			String query =
-					"SELECT COUNT(*),S.SubstanceName "+ 
-					"FROM "+HealthInformationSystem.TableNameAllergicTo + " A, "+ HealthInformationSystem.TableNameSubstance + " S "+
+					"SELECT COUNT(*), S.SubstanceName "+ 
+					"FROM Allergic_To A, Substance S "+
 					"WHERE A.SubstanceId = S.SubstanceId " +
 					"GROUP BY S.SubstanceName";
 			
@@ -129,15 +130,12 @@ public class InterfaceManager {
 				SubstanceName = rs.getString("SubstanceName");
 				
 				if (SubstanceName != null) {
-					System.out.println("Substance Name: " + SubstanceName + ", Number Of Allergic Patients: " + countNum);
+					System.out.println(countNum + " patients are allergic to " + SubstanceName);
 				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-		
-	
 		
 	}
 	
@@ -147,35 +145,36 @@ public class InterfaceManager {
 			Statement st = null;
 			ResultSet rs = null;
 			String patientId;
-			String SubstanceName;
 			String GivenName;
+			String FamilyName;
 			
 			String query =
-					"SELECT DISTINCT P.patientId, P.GivenName" +
-					"FROM Patient P, Allergic_To A" +
-					"WHERE P.patientId = A.patientId" +
+					"SELECT DISTINCT P.patientId, P.GivenName, P.FamilyName " +
+					"FROM Patient P, Allergic_To A " +
+					"WHERE P.patientId = A.patientId " +
 					"GROUP BY P.patientId " +
 					"HAVING COUNT(*)>1";
 			
 			st = con.createStatement();
 			rs = st.executeQuery(query);
 			
-			//TODO: if rs is empty set what is returned
-			
+			int count = 0;
 			while(rs.next()) {
+				++count;
 				patientId = rs.getString("patientId");
 				GivenName = rs.getString("GivenName");
+				FamilyName = rs.getString("FamilyName");
 				
-				
-				System.out.println("Patient Id: " + patientId + ", with the GivenName: " + GivenName + ", has more than one allergy");
-				
+				System.out.println("Patient with Id " + patientId + "and Name " + GivenName + " " + FamilyName + " has more than one allergy");	
 			}
+			
+			if (count == 0) {
+				System.out.println("No patients have more than one allergy");
+			}
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-		
-	
 		
 	}
 
