@@ -8,22 +8,22 @@ public class InterfaceManager {
 	public static void execute() {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		String in;
-		boolean errorOccured = true;
+		boolean invalidInput = true;
 		try {
-			while (errorOccured) {
+			while (invalidInput) {
 				System.out.println("Login as Patient, Doctor, or Adminstrator?");
 				in = br.readLine();
 				
 				if (in.toLowerCase().equals("patient")) {
-					errorOccured = false;
+					invalidInput = false;
 					patientInterface();
 				}
 				else if (in.toLowerCase().equals("doctor")) {
-					errorOccured = false;
+					invalidInput = false;
 					doctorInterface();
 				}
 				else if (in.toLowerCase().equals("adminstrator")) {
-					errorOccured = false;
+					invalidInput = false;
 					adminstratorInterface();
 				}
 				else {
