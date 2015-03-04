@@ -36,7 +36,7 @@ public class InterfaceManager {
 		boolean invalidInput = true;
 		try {
 			while (invalidInput) {
-				System.out.println("Login as Patient, Doctor, or Administrator?");
+				System.out.println("Login as Patient, Doctor, or Admin?");
 				in = br.readLine();
 				
 				if (in.toLowerCase().equals("patient")) {
@@ -47,7 +47,7 @@ public class InterfaceManager {
 					invalidInput = false;
 					doctorInterface(con);
 				}
-				else if (in.toLowerCase().equals("administrator")) {
+				else if (in.toLowerCase().equals("admin")) {
 					invalidInput = false;
 					administratorInterface(con);
 				}
@@ -115,10 +115,11 @@ public class InterfaceManager {
 			String countNum;
 			String SubstanceName;
 			
-			String query = "SELECT COUNT(*),S.SubstanceName "+ 
-					"FROM "+HealthInformationSystem.TableNameAllergicTo + " A, "+ HealthInformationSystem.TableNameSubstance + " S"+
-					" WHERE A.SubstanceId = S.SubstanceId" +
-					" GROUP BY A.SubstanceName ";
+			String query =
+					"SELECT COUNT(*),S.SubstanceName "+ 
+					"FROM "+HealthInformationSystem.TableNameAllergicTo + " A, "+ HealthInformationSystem.TableNameSubstance + " S "+
+					"WHERE A.SubstanceId = S.SubstanceId " +
+					"GROUP BY S.SubstanceName";
 			
 			st = con.createStatement();
 			rs = st.executeQuery(query);
@@ -126,6 +127,10 @@ public class InterfaceManager {
 			while(rs.next()) {
 				countNum = rs.getString("COUNT(*)");
 				SubstanceName = rs.getString("SubstanceName");
+				
+				if (SubstanceName != null) {
+					System.out.println("Substance Name: " + SubstanceName + ", Number Of Allergic Patients: " + countNum);
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
