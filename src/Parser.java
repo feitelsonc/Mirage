@@ -1,17 +1,9 @@
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 public class Parser {
 
@@ -204,8 +196,9 @@ public class Parser {
 					planScheduledFor = new PlanScheduledFor(PlanId, Activity, patientId, ScheduledDate);
 					insertPlanScheduledFor(planScheduledFor, connHealth);
 				}
-				break;
+				
 			}
+			System.out.println("Parsing Succeeded");
 
 		}catch (SQLException e) {
 			e.printStackTrace();
@@ -249,8 +242,8 @@ public class Parser {
 			PatientId = "'"+PatientId.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAllergicTo + " VALUES ('" +Reaction+ "','" +Active+ "','" +SubstanceId+ "','" +PatientId+ "')";
-		System.out.println(insertMessage);
+		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAllergicTo + " VALUES (" + Reaction + "," + Active + "," + SubstanceId + "," + PatientId + ")";
+//		System.out.println(insertMessage);
 		try {
 			executeUpdate(conn, insertMessage);
 		} catch (SQLException e) {
@@ -277,8 +270,8 @@ public class Parser {
 			ParticipatingRole = "'"+ParticipatingRole.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAssignedTo + " VALUES ('" +AuthorId+ "','" +PatientId+ "','" +ParticipatingRole+ "')";
-		System.out.println(insertMessage);
+		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAssignedTo + " VALUES (" + AuthorId + "," + PatientId + "," + ParticipatingRole + ")";
+//		System.out.println(insertMessage);
 		try {
 			executeUpdate(conn, insertMessage);
 		} catch (SQLException e) {
@@ -309,8 +302,8 @@ public class Parser {
 			AuthorLastName = "'"+AuthorLastName.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAuthor + " VALUES ('" +AuthorId+ "','" +AuthorFirstName+ "','" +AuthorTitle+ "','" +AuthorLastName+ "')";
-		System.out.println(insertMessage);
+		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAuthor + " VALUES (" + AuthorId + "," + AuthorFirstName + "," + AuthorTitle + "," + AuthorLastName + ")";
+//		System.out.println(insertMessage);
 		try {
 			executeUpdate(conn, insertMessage);
 		} catch (SQLException e) {
@@ -346,8 +339,8 @@ public class Parser {
 			PatientId = "'"+PatientId.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameFamilyMemberOfPatient + " VALUES ('" +Id+ "','" +Age+ "','" +Relationship+ "','" +Diagnosis+ "','" +PatientId+ "')";
-		System.out.println(insertMessage);
+		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameFamilyMemberOfPatient + " VALUES (" + Id + "," + Age + "," + Relationship + "," + Diagnosis + "," + PatientId + ")";
+//		System.out.println(insertMessage);
 		try {
 			executeUpdate(conn, insertMessage);
 		} catch (SQLException e) {
@@ -398,8 +391,8 @@ public class Parser {
 			Zip = "'"+Zip.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameGuardian + " VALUES ('" +GuardianNo+ "','" +Phone+ "','" +Address+ "','" +State+ "','" +GivenName+ "','" +FamilyName+ "','" +City+ "','" +Zip+ "')";
-		System.out.println(insertMessage);
+		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameGuardian + " VALUES (" + GuardianNo + "," + Phone + "," + Address + "," + State + "," + GivenName + "," + FamilyName + "," + City + "," + Zip + ")";
+//		System.out.println(insertMessage);
 		try {
 			executeUpdate(conn, insertMessage);
 		} catch (SQLException e) {
@@ -420,8 +413,8 @@ public class Parser {
 			Name = "'"+Name.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameInsurance + " VALUES ('" +PayerId+ "','" +Name+ "')";
-		System.out.println(insertMessage);
+		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameInsurance + " VALUES (" + PayerId + "," + Name + ")";
+//		System.out.println(insertMessage);
 		try {
 			executeUpdate(conn, insertMessage);
 		} catch (SQLException e) {
@@ -472,8 +465,8 @@ public class Parser {
 			PatientId = "'"+PatientId.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameLabTestReportOf + " VALUES ('" +LabTestResultId+ "','" +LabTestType+ "','" +ReferenceRangeHigh+ "','" +PatientVisitId+ "','" +LabTestPerformedDate+ "','" +TestResultValue+ "','" +ReferenceRangeLow+ "','" +PatientId+ "')";
-		System.out.println(insertMessage);
+		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameLabTestReportOf + " VALUES (" + LabTestResultId + "," + LabTestType + "," + ReferenceRangeHigh + "," + PatientVisitId + "," + LabTestPerformedDate + "," + TestResultValue + "," + ReferenceRangeLow + "," + PatientId + ")";
+//		System.out.println(insertMessage);
 		try {
 			executeUpdate(conn, insertMessage);
 		} catch (SQLException e) {
@@ -554,8 +547,8 @@ public class Parser {
 			Purpose = "'"+Purpose.replace("'","\\'")+"'";
 		}
 
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNamePatient + " VALUES ('" +PatientId+ "','" +FamilyName+ "','" +GivenName+ "','" +Suffix+ "','" +BirthTime+ "','" +Gender+ "','" +ProviderId+ "','" +xmlHealthCreationDateTime+ "','" +GuardianNo+ "','" +PayerId+ "','" +PatientRole+ "','" +PolicyType+ "','" +PolicyHolder+ "','" +Purpose+ "')";
-		System.out.println(insertMessage);
+		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNamePatient + " VALUES (" + PatientId + "," + FamilyName + "," + GivenName + "," + Suffix + "," + BirthTime + "," + Gender + "," + ProviderId + "," + xmlHealthCreationDateTime + "," + GuardianNo + "," + PayerId + "," + PatientRole + "," + PolicyType + "," + PolicyHolder + "," + Purpose + ")";
+//		System.out.println(insertMessage);
 		try {
 			executeUpdate(conn, insertMessage);
 		} catch (SQLException e) {
@@ -586,8 +579,8 @@ public class Parser {
 			DateScheduled = "'"+DateScheduled.replace("'","\\'")+"'";
 		}
 
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNamePlanScheduledFor + " VALUES ('" +PlanId+ "','" +PlanName+ "','" +PatientId+ "','" +DateScheduled+ "')";
-		System.out.println(insertMessage);
+		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNamePlanScheduledFor + " VALUES (" + PlanId + "," + PlanName + "," + PatientId + "," + DateScheduled + ")";
+//		System.out.println(insertMessage);
 		try {
 			executeUpdate(conn, insertMessage);
 		} catch (SQLException e) {
@@ -608,8 +601,8 @@ public class Parser {
 			SubstanceName = "'"+SubstanceName.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameSubstance + " VALUES ('" +SubstanceId+ "','" +SubstanceName+ "')";
-		System.out.println(insertMessage);
+		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameSubstance + " VALUES (" + SubstanceId + "," + SubstanceName + ")";
+//		System.out.println(insertMessage);
 		try {
 			executeUpdate(conn, insertMessage);
 		} catch (SQLException e) {
