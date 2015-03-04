@@ -11,7 +11,7 @@ public class InterfaceManager {
 		boolean invalidInput = true;
 		try {
 			while (invalidInput) {
-				System.out.println("Login as Patient, Doctor, or Adminstrator?");
+				System.out.println("Login as Patient, Doctor, or Administrator?");
 				in = br.readLine();
 				
 				if (in.toLowerCase().equals("patient")) {
@@ -24,7 +24,7 @@ public class InterfaceManager {
 				}
 				else if (in.toLowerCase().equals("adminstrator")) {
 					invalidInput = false;
-					adminstratorInterface();
+					administratorInterface();
 				}
 				else {
 					System.out.println("Login mode not recognized. Check spelling and try again.");
@@ -45,7 +45,7 @@ public class InterfaceManager {
 		
 	}
 	
-	public static void adminstratorInterface() {
+	public static void administratorInterface() {
 		System.out.println("Entering adminstrator mode.");
 		
 	}
