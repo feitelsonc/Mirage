@@ -198,7 +198,7 @@ public class Parser {
 				}
 				
 			}
-			System.out.println("Parsing Succeeded");
+//			System.out.println("Parsing Succeeded");
 
 		}catch (SQLException e) {
 			e.printStackTrace();
