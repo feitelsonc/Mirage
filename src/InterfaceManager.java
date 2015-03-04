@@ -22,7 +22,7 @@ public class InterfaceManager {
 					invalidInput = false;
 					doctorInterface();
 				}
-				else if (in.toLowerCase().equals("adminstrator")) {
+				else if (in.toLowerCase().equals("administrator")) {
 					invalidInput = false;
 					administratorInterface();
 				}
