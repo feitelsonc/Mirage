@@ -36,7 +36,7 @@ public class InterfaceManager {
 		boolean invalidInput = true;
 		try {
 			while (invalidInput) {
-				System.out.println("Login as Patient, Doctor, or Adminstrator?");
+				System.out.println("Login as Patient, Doctor, or Administrator?");
 				in = br.readLine();
 				
 				if (in.toLowerCase().equals("patient")) {
@@ -47,9 +47,9 @@ public class InterfaceManager {
 					invalidInput = false;
 					doctorInterface(con);
 				}
-				else if (in.toLowerCase().equals("adminstrator")) {
+				else if (in.toLowerCase().equals("administrator")) {
 					invalidInput = false;
-					adminstratorInterface(con);
+					administratorInterface(con);
 				}
 				else {
 					System.out.println("Login mode not recognized. Check spelling and try again.");
@@ -70,8 +70,8 @@ public class InterfaceManager {
 		
 	}
 	
-	private static void adminstratorInterface(Connection con) {
-		System.out.println("Entering adminstrator mode.");
+	private static void administratorInterface(Connection con) {
+		System.out.println("Entering administrator mode.");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		String in;
 		boolean invalidInput = true;
