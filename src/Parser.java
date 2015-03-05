@@ -92,8 +92,6 @@ public class Parser {
 
 			rs = st.executeQuery("SELECT * FROM messages;");
 
-			//TODO: update Last_Accessed in healthmessagesexchange to current time
-
 			while(rs.next()) {
 
 				MsgId = rs.getString("MsgId");
@@ -142,59 +140,142 @@ public class Parser {
 				ScheduledDate = rs.getString("ScheduledDate");
 //				suffix = rs.getString("suffix");
 //				gender = rs.getString("gender");
+				
+				String accessTimeOfMessages = "'"+Long.valueOf(System.currentTimeMillis()).toString()+"'";
+				
+				// insert entire tuple from messages into HealthInformationSystem's table because tuple is new
+				if (Last_Accessed == null) {
+					
+					if(PayerId!=null) {
+						insurance = new Insurance(PayerId, Name);
+						st = connHealth.createStatement();
+						insertOrUpdateInsurance(insurance, connHealth, true);
+					}
 
-				if(PayerId!=null) {
-					insurance = new Insurance(PayerId, Name);
-					st = connHealth.createStatement();
-					insertInsurance(insurance, connHealth);
+					if(GuardianNo!=null) {
+						guardian = new Guardian(GuardianNo, phone, address, state, FirstName, LastName, city, zip);	
+						insertOrUpdateGuardian(guardian, connHealth, true);
+					}
+
+					if(patientId!=null) {
+						patient = new Patient(patientId, FamilyName, GivenName, null, BirthTime, null, providerId, accessTimeOfMessages, GuardianNo, PayerId, Relationship, PolicyType, PolicyHolder, Purpose);
+						insertOrUpdatePatient(patient, connHealth, true);
+					}
+
+					if(LabTestResultId!=null) {
+						labTestReport = new LabTestReport(LabTestResultId, LabTestType, ReferenceRangeHigh, PatientVisitId, LabTestPerformedDate, TestResultValue, ReferenceRangeLow, patientId);
+						insertOrUpdateLabTestReport(labTestReport, connHealth, true);
+					}
+
+					if(RelativeId!=null && patientId!=null) {
+						familyMember = new FamilyMember(RelativeId, age, Relation, Diagnosis, patientId);
+						insertOrUpdateFamilyMember(familyMember, connHealth, true);
+					}
+
+					if(AuthorId!=null) {
+						author = new Author(AuthorId, AuthorFirstName, AuthorTitle, AuthorLastName);
+						insertOrUpdateAuthor(author, connHealth, true);
+					}
+
+					if(AuthorId!=null && patientId!=null) {
+						assignedTo = new AssignedTo(AuthorId, patientId, ParticipatingRole);
+						insertOrUpdateAssignedTo(assignedTo, connHealth, true);
+					}
+
+					if(Id!=null) {
+						substance = new Substance(Id, Substance);
+						insertOrUpdateSubstance(substance, connHealth, true);
+					}
+
+					if(Id!=null && patientId!=null) {
+						allergicTo = new AllergicTo(Reaction, Status, Id, patientId);
+						insertOrUpdateAllergicTo(allergicTo, connHealth, true);
+					}
+
+					if(PlanId!=null) {
+						planScheduledFor = new PlanScheduledFor(PlanId, Activity, patientId, ScheduledDate);
+						insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, true);
+					}
+					
 				}
+				// either update tables in HealthInformationSystem's table because tuple in messages is more recent or ignore tuple if Last_Accessed time is older/equal to the patient's XmlHealthCreationDateTime
+				else {
+					// get creation time of patient
+					String time;
+					Statement statement = connMessage.createStatement();;
+					ResultSet result = null;
+					result = statement.executeQuery("SELECT xmlHealthCreationDateTime FROM Patient WHERE PatientId="+patientId+";");
+					result.next();
+					time= result.getString("xmlHealthCreationDateTime");
 
-				if(GuardianNo!=null) {
-					guardian = new Guardian(GuardianNo, phone, address, state, FirstName, LastName, city, zip);	
-					insertGuardian(guardian, connHealth);
+					if(Long.valueOf(Last_Accessed).longValue() > Long.valueOf(time).longValue()) {
+						if(PayerId!=null) {
+							insurance = new Insurance(PayerId, Name);
+							st = connHealth.createStatement();
+							insertOrUpdateInsurance(insurance, connHealth, false);
+						}
+
+						if(GuardianNo!=null) {
+							guardian = new Guardian(GuardianNo, phone, address, state, FirstName, LastName, city, zip);	
+							insertOrUpdateGuardian(guardian, connHealth, false);
+						}
+
+						if(patientId!=null) {
+							patient = new Patient(patientId, FamilyName, GivenName, null, BirthTime, null, providerId, accessTimeOfMessages, GuardianNo, PayerId, Relationship, PolicyType, PolicyHolder, Purpose);
+							insertOrUpdatePatient(patient, connHealth, false);
+						}
+
+						if(LabTestResultId!=null) {
+							labTestReport = new LabTestReport(LabTestResultId, LabTestType, ReferenceRangeHigh, PatientVisitId, LabTestPerformedDate, TestResultValue, ReferenceRangeLow, patientId);
+							insertOrUpdateLabTestReport(labTestReport, connHealth, false);
+						}
+
+						if(RelativeId!=null && patientId!=null) {
+							familyMember = new FamilyMember(RelativeId, age, Relation, Diagnosis, patientId);
+							insertOrUpdateFamilyMember(familyMember, connHealth, false);
+						}
+
+						if(AuthorId!=null) {
+							author = new Author(AuthorId, AuthorFirstName, AuthorTitle, AuthorLastName);
+							insertOrUpdateAuthor(author, connHealth, false);
+						}
+
+						if(AuthorId!=null && patientId!=null) {
+							assignedTo = new AssignedTo(AuthorId, patientId, ParticipatingRole);
+							insertOrUpdateAssignedTo(assignedTo, connHealth, false);
+						}
+
+						if(Id!=null) {
+							substance = new Substance(Id, Substance);
+							insertOrUpdateSubstance(substance, connHealth, false);
+						}
+
+						if(Id!=null && patientId!=null) {
+							allergicTo = new AllergicTo(Reaction, Status, Id, patientId);
+							insertOrUpdateAllergicTo(allergicTo, connHealth, false);
+						}
+
+						if(PlanId!=null) {
+							planScheduledFor = new PlanScheduledFor(PlanId, Activity, patientId, ScheduledDate);
+							insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, false);
+						}
+					}
+					else {
+						// do nothing because value in HealthInformationSystem is more recent than value in messages
+					}
 				}
-
-				if(patientId!=null) {
-					patient = new Patient(patientId, FamilyName, GivenName, null, BirthTime, null, providerId, Last_Accessed, GuardianNo, PayerId, Relationship, PolicyType, PolicyHolder, Purpose);
-					insertPatient(patient, connHealth);
-				}
-
-				if(LabTestResultId!=null)
-				{
-					labTestReport = new LabTestReport(LabTestResultId, LabTestType, ReferenceRangeHigh, PatientVisitId, LabTestPerformedDate, TestResultValue, ReferenceRangeLow, patientId);
-					insertLabTestReport(labTestReport, connHealth);
-				}
-
-				if(RelativeId!=null && patientId!=null) {
-					familyMember = new FamilyMember(RelativeId, age, Relation, Diagnosis, patientId);
-					insertFamilyMember(familyMember, connHealth);
-				}
-
-				if(AuthorId!=null) {
-					author = new Author(AuthorId, AuthorFirstName, AuthorTitle, AuthorLastName);
-					insertAuthor(author, connHealth);
-				}
-
-				if(AuthorId!=null && patientId!=null)
-				{
-					assignedTo = new AssignedTo(AuthorId, patientId, ParticipatingRole);
-					insertAssignedTo(assignedTo, connHealth);
-				}
-
-				if(Id!=null)
-				{
-					substance = new Substance(Id, Substance);
-					insertSubstance(substance, connHealth);
-				}
-
-				if(Id!=null && patientId!=null) {
-					allergicTo = new AllergicTo(Reaction, Status, Id, patientId);
-					insertAllergicTo(allergicTo, connHealth);
-				}
-
-				if(PlanId!=null) {
-					planScheduledFor = new PlanScheduledFor(PlanId, Activity, patientId, ScheduledDate);
-					insertPlanScheduledFor(planScheduledFor, connHealth);
+				
+				// update access time of messages table
+				String currMsgId = "'"+MsgId+"'";
+				String updateMessage = "UPDATE messages "
+						+ "SET Last_Accessed=" + accessTimeOfMessages + " "
+						+ "WHERE MsgId=" + currMsgId;
+				Statement statement = null;
+				try {
+					statement = connMessage.createStatement();
+					statement.executeUpdate(updateMessage);
+				} finally {
+					if (statement != null) { statement.close(); }
 				}
 				
 			}
@@ -218,8 +299,9 @@ public class Parser {
 		}
 	}
 	
+	/*******************************************************************/
 	
-	private static void insertAllergicTo(AllergicTo allergicTo, Connection conn) {
+	private static void insertOrUpdateAllergicTo(AllergicTo allergicTo, Connection conn, boolean isInsert) {
 		String Reaction = "NULL";
 		String Active = "NULL";
 		String SubstanceId = "NULL";
@@ -242,17 +324,22 @@ public class Parser {
 			PatientId = "'"+PatientId.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAllergicTo + " VALUES (" + Reaction + "," + Active + "," + SubstanceId + "," + PatientId + ")";
-//		System.out.println(insertMessage);
-		try {
-			executeUpdate(conn, insertMessage);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if (isInsert){
+			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAllergicTo + " VALUES (" + Reaction + "," + Active + "," + SubstanceId + "," + PatientId + ")";
+//			System.out.println(insertMessage);
+			try {
+				executeUpdate(conn, insertMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			//TODO: do update
 		}
 		
 	}
 	
-	private static void insertAssignedTo(AssignedTo assignedTo, Connection conn) {
+	private static void insertOrUpdateAssignedTo(AssignedTo assignedTo, Connection conn, boolean isInsert) {
 		String AuthorId = "NULL";
 		String PatientId = "NULL";
 		String ParticipatingRole = "NULL";
@@ -270,16 +357,21 @@ public class Parser {
 			ParticipatingRole = "'"+ParticipatingRole.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAssignedTo + " VALUES (" + AuthorId + "," + PatientId + "," + ParticipatingRole + ")";
-//		System.out.println(insertMessage);
-		try {
-			executeUpdate(conn, insertMessage);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if (isInsert) {
+			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAssignedTo + " VALUES (" + AuthorId + "," + PatientId + "," + ParticipatingRole + ")";
+//			System.out.println(insertMessage);
+			try {
+				executeUpdate(conn, insertMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			//TODO: do update
 		}
 	}
 	
-	private static void insertAuthor(Author author, Connection conn) {
+	private static void insertOrUpdateAuthor(Author author, Connection conn, boolean isInsert) {
 		String AuthorId = "NULL";
 		String AuthorFirstName = "NULL";
 		String AuthorTitle = "NULL";
@@ -302,16 +394,21 @@ public class Parser {
 			AuthorLastName = "'"+AuthorLastName.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAuthor + " VALUES (" + AuthorId + "," + AuthorFirstName + "," + AuthorTitle + "," + AuthorLastName + ")";
-//		System.out.println(insertMessage);
-		try {
-			executeUpdate(conn, insertMessage);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if (isInsert) {
+			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAuthor + " VALUES (" + AuthorId + "," + AuthorFirstName + "," + AuthorTitle + "," + AuthorLastName + ")";
+//			System.out.println(insertMessage);
+			try {
+				executeUpdate(conn, insertMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			//TODO: do update
 		}
 	}
 	
-	private static void insertFamilyMember(FamilyMember familyMember, Connection conn) {
+	private static void insertOrUpdateFamilyMember(FamilyMember familyMember, Connection conn, boolean isInsert) {
 		String Id = "NULL";
 		String Age = "NULL";
 		String Relationship = "NULL";
@@ -339,16 +436,21 @@ public class Parser {
 			PatientId = "'"+PatientId.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameFamilyMemberOfPatient + " VALUES (" + Id + "," + Age + "," + Relationship + "," + Diagnosis + "," + PatientId + ")";
-//		System.out.println(insertMessage);
-		try {
-			executeUpdate(conn, insertMessage);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if (isInsert) {
+			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameFamilyMemberOfPatient + " VALUES (" + Id + "," + Age + "," + Relationship + "," + Diagnosis + "," + PatientId + ")";
+//			System.out.println(insertMessage);
+			try {
+				executeUpdate(conn, insertMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			//TODO: do update
 		}
 	}
 	
-	private static void insertGuardian(Guardian guardian, Connection conn) {
+	private static void insertOrUpdateGuardian(Guardian guardian, Connection conn, boolean isInsert) {
 		String GuardianNo = "NULL";
 		String Phone = "NULL";
 		String Address = "NULL";
@@ -391,16 +493,21 @@ public class Parser {
 			Zip = "'"+Zip.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameGuardian + " VALUES (" + GuardianNo + "," + Phone + "," + Address + "," + State + "," + GivenName + "," + FamilyName + "," + City + "," + Zip + ")";
-//		System.out.println(insertMessage);
-		try {
-			executeUpdate(conn, insertMessage);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if (isInsert) {
+			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameGuardian + " VALUES (" + GuardianNo + "," + Phone + "," + Address + "," + State + "," + GivenName + "," + FamilyName + "," + City + "," + Zip + ")";
+//			System.out.println(insertMessage);
+			try {
+				executeUpdate(conn, insertMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			//TODO: do update
 		}
 	}
 	
-	private static void insertInsurance(Insurance insurance, Connection conn) {
+	private static void insertOrUpdateInsurance(Insurance insurance, Connection conn, boolean isInsert) {
 		String PayerId = "NULL";
 		String Name = "NULL";
 		
@@ -413,16 +520,21 @@ public class Parser {
 			Name = "'"+Name.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameInsurance + " VALUES (" + PayerId + "," + Name + ")";
-//		System.out.println(insertMessage);
-		try {
-			executeUpdate(conn, insertMessage);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if (isInsert) {
+			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameInsurance + " VALUES (" + PayerId + "," + Name + ")";
+//			System.out.println(insertMessage);
+			try {
+				executeUpdate(conn, insertMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			//TODO: do update
 		}
 	}
 	
-	private static void insertLabTestReport(LabTestReport labTestReport, Connection conn) {
+	private static void insertOrUpdateLabTestReport(LabTestReport labTestReport, Connection conn, boolean isInsert) {
 		String LabTestResultId = "NULL";
 		String LabTestType = "NULL";
 		String ReferenceRangeHigh = "NULL";
@@ -465,16 +577,21 @@ public class Parser {
 			PatientId = "'"+PatientId.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameLabTestReportOf + " VALUES (" + LabTestResultId + "," + LabTestType + "," + ReferenceRangeHigh + "," + PatientVisitId + "," + LabTestPerformedDate + "," + TestResultValue + "," + ReferenceRangeLow + "," + PatientId + ")";
-//		System.out.println(insertMessage);
-		try {
-			executeUpdate(conn, insertMessage);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if (isInsert) {
+			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameLabTestReportOf + " VALUES (" + LabTestResultId + "," + LabTestType + "," + ReferenceRangeHigh + "," + PatientVisitId + "," + LabTestPerformedDate + "," + TestResultValue + "," + ReferenceRangeLow + "," + PatientId + ")";
+//			System.out.println(insertMessage);
+			try {
+				executeUpdate(conn, insertMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			//TODO: do update
 		}
 	}
 	
-	private static void insertPatient(Patient patient, Connection conn) {
+	private static void insertOrUpdatePatient(Patient patient, Connection conn, boolean isInsert) {
 		String PatientId = "NULL";
 		String FamilyName = "NULL";
 		String GivenName = "NULL";
@@ -547,16 +664,21 @@ public class Parser {
 			Purpose = "'"+Purpose.replace("'","\\'")+"'";
 		}
 
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNamePatient + " VALUES (" + PatientId + "," + FamilyName + "," + GivenName + "," + Suffix + "," + BirthTime + "," + Gender + "," + ProviderId + "," + xmlHealthCreationDateTime + "," + GuardianNo + "," + PayerId + "," + PatientRole + "," + PolicyType + "," + PolicyHolder + "," + Purpose + ")";
-//		System.out.println(insertMessage);
-		try {
-			executeUpdate(conn, insertMessage);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if (isInsert) {
+			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNamePatient + " VALUES (" + PatientId + "," + FamilyName + "," + GivenName + "," + Suffix + "," + BirthTime + "," + Gender + "," + ProviderId + "," + xmlHealthCreationDateTime + "," + GuardianNo + "," + PayerId + "," + PatientRole + "," + PolicyType + "," + PolicyHolder + "," + Purpose + ")";
+//			System.out.println(insertMessage);
+			try {
+				executeUpdate(conn, insertMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			//TODO: do update
 		}
 	}
 	
-	private static void insertPlanScheduledFor(PlanScheduledFor planScheduledFor, Connection conn) {
+	private static void insertOrUpdatePlanScheduledFor(PlanScheduledFor planScheduledFor, Connection conn, boolean isInsert) {
 		String PlanId = "NULL";
 		String PlanName = "NULL";
 		String PatientId = "NULL";
@@ -579,16 +701,21 @@ public class Parser {
 			DateScheduled = "'"+DateScheduled.replace("'","\\'")+"'";
 		}
 
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNamePlanScheduledFor + " VALUES (" + PlanId + "," + PlanName + "," + PatientId + "," + DateScheduled + ")";
-//		System.out.println(insertMessage);
-		try {
-			executeUpdate(conn, insertMessage);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if (isInsert) {
+			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNamePlanScheduledFor + " VALUES (" + PlanId + "," + PlanName + "," + PatientId + "," + DateScheduled + ")";
+//			System.out.println(insertMessage);
+			try {
+				executeUpdate(conn, insertMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			//TODO: do update
 		}
 	}
 	
-	private static void insertSubstance(Substance substance, Connection conn) {
+	private static void insertOrUpdateSubstance(Substance substance, Connection conn, boolean isInsert) {
 		String SubstanceId = "NULL";
 		String SubstanceName = "NULL";
 		
@@ -601,12 +728,17 @@ public class Parser {
 			SubstanceName = "'"+SubstanceName.replace("'","\\'")+"'";
 		}
 		
-		String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameSubstance + " VALUES (" + SubstanceId + "," + SubstanceName + ")";
-//		System.out.println(insertMessage);
-		try {
-			executeUpdate(conn, insertMessage);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if (isInsert) {
+			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameSubstance + " VALUES (" + SubstanceId + "," + SubstanceName + ")";
+//			System.out.println(insertMessage);
+			try {
+				executeUpdate(conn, insertMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			//TODO: do update
 		}
 	}
 	
