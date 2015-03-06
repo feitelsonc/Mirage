@@ -141,7 +141,7 @@ public class Parser {
 				//				suffix = rs.getString("suffix");
 				//				gender = rs.getString("gender");
 
-				String accessTimeOfMessages = "'"+Long.valueOf(System.currentTimeMillis()).toString()+"'";
+				String accessTimeOfMessages = Long.valueOf(System.currentTimeMillis()).toString();
 
 				String queryAttribute, queryAttribute1;
 
@@ -232,7 +232,7 @@ public class Parser {
 
 						statement = connHealth.createStatement();
 						queryAttribute = "'"+AuthorId.replace("'","\\'")+"'";
-						System.out.println("SELECT * FROM Author WHERE AuthorId="+AuthorId);
+//						System.out.println("SELECT * FROM Author WHERE AuthorId="+AuthorId);
 						result = statement.executeQuery("SELECT * FROM Author WHERE AuthorId="+queryAttribute);
 						if(result.next()) {
 							insertOrUpdateAuthor(author, connHealth, false);
@@ -318,7 +318,7 @@ public class Parser {
 					else {
 						time= "0";
 					}
-
+					
 					if(Long.valueOf(Last_Accessed).longValue() > Long.valueOf(time).longValue()) {
 						if(PayerId!=null) {
 							insurance = new Insurance(PayerId, Name);
@@ -459,7 +459,7 @@ public class Parser {
 							planScheduledFor = new PlanScheduledFor(PlanId, Activity, patientId, ScheduledDate);
 
 							statement = connHealth.createStatement();
-							queryAttribute = "'"+Id.replace("'","\\'")+"'";
+							queryAttribute = "'"+PlanId.replace("'","\\'")+"'";
 							queryAttribute1 = "'"+patientId.replace("'","\\'")+"'";
 							result = statement.executeQuery("SELECT * FROM Plan_Scheduled_For WHERE PlanId="+queryAttribute + " AND PatientId="+queryAttribute1);
 							if(result.next()) {
@@ -544,7 +544,7 @@ public class Parser {
 		else {
 			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameAllergicTo + 
 					" SET Reaction=" + Reaction + " ," +
-					" Active=" + PatientId + " ," +
+					" Active=" + Active + " ," +
 					" SubstanceId=" + SubstanceId + " ," +
 					" PatientId=" + PatientId +
 					" WHERE SubstanceId=" + SubstanceId;
@@ -589,7 +589,7 @@ public class Parser {
 			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameAssignedTo + 
 					" SET AuthorId=" + AuthorId + " ," +
 					" PatientId=" + PatientId + " ," +
-					" SubstanceId=" + ParticipatingRole +
+					" ParticipatingRole=" + ParticipatingRole +
 					" WHERE AuthorId=" + AuthorId + " AND" +
 					" PatientId=" + PatientId;
 			try {

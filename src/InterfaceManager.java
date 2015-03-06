@@ -169,7 +169,7 @@ public class InterfaceManager {
 				GivenName = rs.getString("GivenName");
 				FamilyName = rs.getString("FamilyName");
 				
-				System.out.println("Patient with Id " + patientId + "and Name " + GivenName + " " + FamilyName + " has more than one allergy");	
+				System.out.println(GivenName + " " + FamilyName + " has more than one allergy");	
 			}
 			
 			if (count == 0) {
