@@ -157,12 +157,12 @@ public class Parser {
 						insertOrUpdateGuardian(guardian, connHealth, true);
 					}
 
-					if(patientId!=null) {
+					if(patientId!=null && GuardianNo!=null && PayerId!=null) {
 						patient = new Patient(patientId, FamilyName, GivenName, null, BirthTime, null, providerId, accessTimeOfMessages, GuardianNo, PayerId, Relationship, PolicyType, PolicyHolder, Purpose);
 						insertOrUpdatePatient(patient, connHealth, true);
 					}
 
-					if(LabTestResultId!=null) {
+					if(LabTestResultId!=null && patientId!=null) {
 						labTestReport = new LabTestReport(LabTestResultId, LabTestType, ReferenceRangeHigh, PatientVisitId, LabTestPerformedDate, TestResultValue, ReferenceRangeLow, patientId);
 						insertOrUpdateLabTestReport(labTestReport, connHealth, true);
 					}
@@ -192,7 +192,7 @@ public class Parser {
 						insertOrUpdateAllergicTo(allergicTo, connHealth, true);
 					}
 
-					if(PlanId!=null) {
+					if(PlanId!=null && patientId!=null) {
 						planScheduledFor = new PlanScheduledFor(PlanId, Activity, patientId, ScheduledDate);
 						insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, true);
 					}
@@ -220,12 +220,12 @@ public class Parser {
 							insertOrUpdateGuardian(guardian, connHealth, false);
 						}
 
-						if(patientId!=null) {
+						if(patientId!=null && GuardianNo!=null && PayerId!=null) {
 							patient = new Patient(patientId, FamilyName, GivenName, null, BirthTime, null, providerId, accessTimeOfMessages, GuardianNo, PayerId, Relationship, PolicyType, PolicyHolder, Purpose);
 							insertOrUpdatePatient(patient, connHealth, false);
 						}
 
-						if(LabTestResultId!=null) {
+						if(LabTestResultId!=null && patientId!=null) {
 							labTestReport = new LabTestReport(LabTestResultId, LabTestType, ReferenceRangeHigh, PatientVisitId, LabTestPerformedDate, TestResultValue, ReferenceRangeLow, patientId);
 							insertOrUpdateLabTestReport(labTestReport, connHealth, false);
 						}
@@ -255,7 +255,7 @@ public class Parser {
 							insertOrUpdateAllergicTo(allergicTo, connHealth, false);
 						}
 
-						if(PlanId!=null) {
+						if(PlanId!=null && patientId!=null) {
 							planScheduledFor = new PlanScheduledFor(PlanId, Activity, patientId, ScheduledDate);
 							insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, false);
 						}
@@ -270,12 +270,10 @@ public class Parser {
 				String updateMessage = "UPDATE messages "
 						+ "SET Last_Accessed=" + accessTimeOfMessages + " "
 						+ "WHERE MsgId=" + currMsgId;
-				Statement statement = null;
 				try {
-					statement = connMessage.createStatement();
-					statement.executeUpdate(updateMessage);
-				} finally {
-					if (statement != null) { statement.close(); }
+					executeUpdate(connMessage, updateMessage);
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
 				
 			}
@@ -334,7 +332,18 @@ public class Parser {
 			}
 		}
 		else {
-			//TODO: do update
+			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameAllergicTo + 
+					" SET Reaction=" + Reaction + " ," +
+					" Active=" + PatientId + " ," +
+					" SubstanceId=" + SubstanceId + " ," +
+					" PatientId=" + PatientId +
+					" WHERE SubstanceId=" + SubstanceId;
+			try {
+				
+				executeUpdate(conn,updateMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		
 	}
@@ -367,7 +376,18 @@ public class Parser {
 			}
 		}
 		else {
-			//TODO: do update
+			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameAssignedTo + 
+					" SET AuthorId=" + AuthorId + " ," +
+					" PatientId=" + PatientId + " ," +
+					" SubstanceId=" + ParticipatingRole +
+					" WHERE AuthorId=" + AuthorId + " AND" +
+					" PatientId=" + PatientId;
+			try {
+				
+				executeUpdate(conn,updateMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -404,7 +424,18 @@ public class Parser {
 			}
 		}
 		else {
-			//TODO: do update
+			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameAuthor + 
+					" SET AuthorId=" + AuthorId + " ," +
+					" AuthorFirstName=" + AuthorFirstName + " ," +
+					" AuthorTitle=" + AuthorTitle + " ," +
+					" AuthorLastName=" + AuthorLastName +
+					" WHERE AuthorId=" + AuthorId;
+			try {
+				
+				executeUpdate(conn,updateMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -446,7 +477,20 @@ public class Parser {
 			}
 		}
 		else {
-			//TODO: do update
+			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameFamilyMemberOfPatient + 
+					" SET Id=" + Id + " ," +
+					" Age=" + Age + " ," +
+					" Relationship=" + Relationship + " ," +
+					" PatientId=" + PatientId + " ," +
+					" Diagnosis=" + Diagnosis +
+					" WHERE PatientId=" + PatientId + " AND" +
+					" Id=" + Id;
+			try {
+				
+				executeUpdate(conn,updateMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -503,7 +547,22 @@ public class Parser {
 			}
 		}
 		else {
-			//TODO: do update
+			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameGuardian + 
+					" SET GuardianNo=" + GuardianNo + " ," +
+					" Phone=" + Phone + " ," +
+					" Address=" + Address + " ," +
+					" State=" + State + " ," +
+					" GivenName=" + GivenName + " ," +
+					" FamilyName=" + FamilyName + " ," +
+					" Zip=" + Zip + " ," +
+					" City=" + City +
+					" WHERE GuardianNo=" + GuardianNo;
+			try {
+				
+				executeUpdate(conn,updateMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -530,7 +589,16 @@ public class Parser {
 			}
 		}
 		else {
-			//TODO: do update
+			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameInsurance + 
+					" SET PayerId=" + PayerId + " ," +
+					" Name=" + Name +
+					" WHERE PayerId=" + PayerId;
+			try {
+				
+				executeUpdate(conn,updateMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}		
 		}
 	}
 	
@@ -587,7 +655,22 @@ public class Parser {
 			}
 		}
 		else {
-			//TODO: do update
+			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameLabTestReportOf + 
+					" SET LabTestResultId=" + LabTestResultId + " ," +
+					" LabTestType=" + LabTestType + " ," +
+					" ReferenceRangeHigh=" + ReferenceRangeHigh + " ," +
+					" PatientVisitId=" + PatientVisitId + " ," +
+					" LabTestPerformedDate=" + LabTestPerformedDate + " ," +
+					" TestResultValue=" + TestResultValue + " ," +
+					" ReferenceRangeLow=" + ReferenceRangeLow + " ," +
+					" PatientId=" + PatientId +
+					" WHERE LabTestResultId=" + LabTestResultId;
+			try {
+				
+				executeUpdate(conn,updateMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}		
 		}
 	}
 	
@@ -674,7 +757,28 @@ public class Parser {
 			}
 		}
 		else {
-			//TODO: do update
+			String updateMessage = "UPDATE " + HealthInformationSystem.TableNamePatient + 
+					" SET PatientId=" + PatientId + " ," +
+					" FamilyName=" + FamilyName + " ," +
+					" GivenName=" + GivenName + " ," +
+					" Suffix=" + Suffix + " ," +
+					" BirthTime=" + BirthTime + " ," +
+					" Gender=" + Gender + " ," +
+					" ProviderId=" + ProviderId + " ," +
+					" GuardianNo=" + GuardianNo + " ," +
+					" PayerId=" + PayerId + " ," +
+					" PatientRole=" + PatientRole + " ," +
+					" PolicyType=" + PolicyType + " ," +
+					" PolicyHolder=" + PolicyHolder + " ," +
+					" Purpose=" + Purpose + " ," +
+					" xmlHealthCreationDateTime=" + xmlHealthCreationDateTime +
+					" WHERE PatientId=" + PatientId;
+			try {
+				
+				executeUpdate(conn,updateMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}				
 		}
 	}
 	
@@ -711,7 +815,18 @@ public class Parser {
 			}
 		}
 		else {
-			//TODO: do update
+			String updateMessage = "UPDATE " + HealthInformationSystem.TableNamePlanScheduledFor + 
+					" SET PlanId=" + PlanId + " ," +
+					" PlanName=" + PlanName + " ," +
+					" PatientId=" + PatientId + " ," +
+					" DateScheduled=" + DateScheduled +
+					" WHERE PlanId=" + PlanId;
+			try {
+				
+				executeUpdate(conn,updateMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}	
 		}
 	}
 	
@@ -738,7 +853,16 @@ public class Parser {
 			}
 		}
 		else {
-			//TODO: do update
+			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameSubstance + 
+					" SET SubstanceId=" + SubstanceId + " ," +
+					" SubstanceName=" + SubstanceName +
+					" WHERE SubstanceId=" + SubstanceId;
+			try {
+				
+				executeUpdate(conn,updateMessage);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
