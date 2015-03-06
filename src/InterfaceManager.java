@@ -132,6 +132,10 @@ public class InterfaceManager {
 				if (SubstanceName != null) {
 					System.out.println(countNum + " patients are allergic to " + SubstanceName);
 				}
+				else
+				{
+					System.out.println(countNum + " patients are not allergic to any substance");
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
