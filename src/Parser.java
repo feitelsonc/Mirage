@@ -138,22 +138,25 @@ public class Parser {
 				PlanId = rs.getString("PlanId");
 				Activity = rs.getString("Activity");
 				ScheduledDate = rs.getString("ScheduledDate");
-//				suffix = rs.getString("suffix");
-//				gender = rs.getString("gender");
-				
+				//				suffix = rs.getString("suffix");
+				//				gender = rs.getString("gender");
+
 				String accessTimeOfMessages = "'"+Long.valueOf(System.currentTimeMillis()).toString()+"'";
-				
+
+				String queryAttribute, queryAttribute1;
+
 				// insert entire tuple from messages into HealthInformationSystem's table because tuple is new
 				if (Last_Accessed == null) {
-					
+
 					Statement statement = connMessage.createStatement();
 					ResultSet result = null;
-					
+
 					if(PayerId!=null) {
 						insurance = new Insurance(PayerId, Name);
-						
+
 						statement = connHealth.createStatement();
-						result = st.executeQuery("SELECT (*) FROM Insurance WHERE PayerId="+PayerId);
+						queryAttribute = "'"+PayerId.replace("'","\\'")+"'";
+						result = statement.executeQuery("SELECT * FROM Insurance WHERE PayerId="+queryAttribute);
 						if(result.next()) {
 							insertOrUpdateInsurance(insurance, connHealth, false);
 
@@ -165,24 +168,26 @@ public class Parser {
 
 					if(GuardianNo!=null) {
 						guardian = new Guardian(GuardianNo, phone, address, state, FirstName, LastName, city, zip);	
-						
+
 						statement = connHealth.createStatement();
-						result = st.executeQuery("SELECT (*) FROM Guardian WHERE GuardianNo="+GuardianNo);
+						queryAttribute = "'"+GuardianNo.replace("'","\\'")+"'";
+						result = statement.executeQuery("SELECT * FROM Guardian WHERE GuardianNo="+queryAttribute);
 						if(result.next()) {
 							insertOrUpdateGuardian(guardian, connHealth, false);
 						}
 						else {
 							insertOrUpdateGuardian(guardian, connHealth, true);
 						}
-						
+
 					}
 
 					if(patientId!=null && GuardianNo!=null && PayerId!=null) {
 						patient = new Patient(patientId, FamilyName, GivenName, null, BirthTime, null, providerId, accessTimeOfMessages, GuardianNo, PayerId, Relationship, PolicyType, PolicyHolder, Purpose);
-						
+
 						statement = connHealth.createStatement();
-						result = st.executeQuery("SELECT (*) FROM Patient WHERE PatientId="+patientId);
-						
+						queryAttribute = "'"+patientId.replace("'","\\'")+"'";
+						result = statement.executeQuery("SELECT * FROM Patient WHERE PatientId="+queryAttribute);
+
 						if(result.next()) {
 							insertOrUpdatePatient(patient, connHealth, false);
 						}
@@ -193,23 +198,27 @@ public class Parser {
 
 					if(LabTestResultId!=null && patientId!=null) {
 						labTestReport = new LabTestReport(LabTestResultId, LabTestType, ReferenceRangeHigh, PatientVisitId, LabTestPerformedDate, TestResultValue, ReferenceRangeLow, patientId);
-						
+
 						statement = connHealth.createStatement();
-						result = st.executeQuery("SELECT (*) FROM Lab_Test_Report_Of WHERE LabTestResultId="+LabTestResultId +" AND PatientId="+patientId);
+						queryAttribute = "'"+LabTestResultId.replace("'","\\'")+"'";
+						queryAttribute1 = "'"+patientId.replace("'","\\'")+"'";
+						result = statement.executeQuery("SELECT * FROM Lab_Test_Report_Of WHERE LabTestResultId="+queryAttribute +" AND PatientId="+queryAttribute1);
 						if(result.next()) {
 							insertOrUpdateLabTestReport(labTestReport, connHealth, false);
 						}
 						else {
 							insertOrUpdateLabTestReport(labTestReport, connHealth, true);
 						}
-						
+
 					}
 
 					if(RelativeId!=null && patientId!=null) {
 						familyMember = new FamilyMember(RelativeId, age, Relation, Diagnosis, patientId);
-						
+
 						statement = connHealth.createStatement();
-						result = st.executeQuery("SELECT (*) FROM Family_Member_Of_Patient WHERE Id="+RelativeId + " AND PatientId="+patientId);
+						queryAttribute = "'"+RelativeId.replace("'","\\'")+"'";
+						queryAttribute1 = "'"+patientId.replace("'","\\'")+"'";
+						result = statement.executeQuery("SELECT * FROM Family_Member_Of_Patient WHERE Id="+queryAttribute + " AND PatientId="+queryAttribute1);
 						if(result.next()) {
 							insertOrUpdateFamilyMember(familyMember, connHealth, false);
 						}
@@ -220,9 +229,11 @@ public class Parser {
 
 					if(AuthorId!=null) {
 						author = new Author(AuthorId, AuthorFirstName, AuthorTitle, AuthorLastName);
-						
+
 						statement = connHealth.createStatement();
-						result = st.executeQuery("SELECT (*) FROM Author WHERE AuthorId="+AuthorId);
+						queryAttribute = "'"+AuthorId.replace("'","\\'")+"'";
+						System.out.println("SELECT * FROM Author WHERE AuthorId="+AuthorId);
+						result = statement.executeQuery("SELECT * FROM Author WHERE AuthorId="+queryAttribute);
 						if(result.next()) {
 							insertOrUpdateAuthor(author, connHealth, false);
 						}
@@ -233,9 +244,11 @@ public class Parser {
 
 					if(AuthorId!=null && patientId!=null) {
 						assignedTo = new AssignedTo(AuthorId, patientId, ParticipatingRole);
-						
+
 						statement = connHealth.createStatement();
-						result = st.executeQuery("SELECT (*) FROM Assigned_To WHERE AuthorId="+AuthorId + " AND PatientId="+patientId);
+						queryAttribute = "'"+AuthorId.replace("'","\\'")+"'";
+						queryAttribute1 = "'"+patientId.replace("'","\\'")+"'";
+						result = statement.executeQuery("SELECT * FROM Assigned_To WHERE AuthorId="+queryAttribute + " AND PatientId="+queryAttribute1);
 						if(result.next()) {
 							insertOrUpdateAssignedTo(assignedTo, connHealth, false);
 						}
@@ -246,9 +259,10 @@ public class Parser {
 
 					if(Id!=null) {
 						substance = new Substance(Id, Substance);
-						
+
 						statement = connHealth.createStatement();
-						result = st.executeQuery("SELECT (*) FROM Substance WHERE SubstanceId="+Id);
+						queryAttribute = "'"+Id.replace("'","\\'")+"'";
+						result = statement.executeQuery("SELECT * FROM Substance WHERE SubstanceId="+queryAttribute);
 						if(result.next()) {
 							insertOrUpdateSubstance(substance, connHealth, false);
 						}
@@ -259,9 +273,11 @@ public class Parser {
 
 					if(Id!=null && patientId!=null) {
 						allergicTo = new AllergicTo(Reaction, Status, Id, patientId);
-						
+
 						statement = connHealth.createStatement();
-						result = st.executeQuery("SELECT (*) FROM Allergic_To WHERE SubstanceId="+Id + " AND PatientId="+patientId);
+						queryAttribute = "'"+Id.replace("'","\\'")+"'";
+						queryAttribute1 = "'"+patientId.replace("'","\\'")+"'";
+						result = statement.executeQuery("SELECT * FROM Allergic_To WHERE SubstanceId="+queryAttribute + " AND PatientId="+queryAttribute1);
 						if(result.next()) {
 							insertOrUpdateAllergicTo(allergicTo, connHealth, false);
 						}
@@ -272,9 +288,11 @@ public class Parser {
 
 					if(PlanId!=null && patientId!=null) {
 						planScheduledFor = new PlanScheduledFor(PlanId, Activity, patientId, ScheduledDate);
-						
+
 						statement = connHealth.createStatement();
-						result = st.executeQuery("SELECT (*) FROM Plan_Scheduled_For WHERE PlanId="+PlanId + " AND PatientId="+patientId);
+						queryAttribute = "'"+Id.replace("'","\\'")+"'";
+						queryAttribute1 = "'"+patientId.replace("'","\\'")+"'";
+						result = statement.executeQuery("SELECT * FROM Plan_Scheduled_For WHERE PlanId="+queryAttribute + " AND PatientId="+queryAttribute1);
 						if(result.next()) {
 							insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, false);
 						}
@@ -282,30 +300,32 @@ public class Parser {
 							insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, true);
 						}
 					}
-					
+
 				}
 				// either update tables in HealthInformationSystem's table because tuple in messages is more recent or ignore tuple if Last_Accessed time is older/equal to the patient's XmlHealthCreationDateTime
 				else {
 					// get creation time of patient
 					String time;
-					Statement statement = connMessage.createStatement();;
+					Statement statement = connHealth.createStatement();;
 					ResultSet result = null;
-					result = statement.executeQuery("SELECT xmlHealthCreationDateTime FROM Patient WHERE PatientId="+patientId);
+					queryAttribute = "'"+patientId.replace("'","\\'")+"'";
+					result = statement.executeQuery("SELECT xmlHealthCreationDateTime FROM Patient WHERE PatientId="+queryAttribute);
 					boolean patientAlreadyExists = result.next();
-					
+
 					if (patientAlreadyExists) {
 						time= result.getString("xmlHealthCreationDateTime");
 					}
 					else {
 						time= "0";
 					}
-					
+
 					if(Long.valueOf(Last_Accessed).longValue() > Long.valueOf(time).longValue()) {
 						if(PayerId!=null) {
 							insurance = new Insurance(PayerId, Name);
-							
+
 							statement = connHealth.createStatement();
-							result = st.executeQuery("SELECT (*) FROM Insurance WHERE PayerId="+PayerId);
+							queryAttribute = "'"+PayerId.replace("'","\\'")+"'";
+							result = statement.executeQuery("SELECT * FROM Insurance WHERE PayerId="+queryAttribute);
 							if(result.next()) {
 								insertOrUpdateInsurance(insurance, connHealth, false);
 
@@ -317,22 +337,27 @@ public class Parser {
 
 						if(GuardianNo!=null) {
 							guardian = new Guardian(GuardianNo, phone, address, state, FirstName, LastName, city, zip);	
-							
+
 							statement = connHealth.createStatement();
-							result = st.executeQuery("SELECT (*) FROM Guardian WHERE GuardianNo="+GuardianNo);
+							queryAttribute = "'"+GuardianNo.replace("'","\\'")+"'";
+							result = statement.executeQuery("SELECT * FROM Guardian WHERE GuardianNo="+queryAttribute);
 							if(result.next()) {
 								insertOrUpdateGuardian(guardian, connHealth, false);
 							}
 							else {
 								insertOrUpdateGuardian(guardian, connHealth, true);
 							}
-							
+
 						}
 
 						if(patientId!=null && GuardianNo!=null && PayerId!=null) {
 							patient = new Patient(patientId, FamilyName, GivenName, null, BirthTime, null, providerId, accessTimeOfMessages, GuardianNo, PayerId, Relationship, PolicyType, PolicyHolder, Purpose);
 
-							if(patientAlreadyExists) {
+							statement = connHealth.createStatement();
+							queryAttribute = "'"+patientId.replace("'","\\'")+"'";
+							result = statement.executeQuery("SELECT * FROM Patient WHERE PatientId="+queryAttribute);
+
+							if(result.next()) {
 								insertOrUpdatePatient(patient, connHealth, false);
 							}
 							else {
@@ -342,23 +367,27 @@ public class Parser {
 
 						if(LabTestResultId!=null && patientId!=null) {
 							labTestReport = new LabTestReport(LabTestResultId, LabTestType, ReferenceRangeHigh, PatientVisitId, LabTestPerformedDate, TestResultValue, ReferenceRangeLow, patientId);
-							
+
 							statement = connHealth.createStatement();
-							result = st.executeQuery("SELECT (*) FROM Lab_Test_Report_Of WHERE LabTestResultId="+LabTestResultId +" AND PatientId="+patientId);
+							queryAttribute = "'"+LabTestResultId.replace("'","\\'")+"'";
+							queryAttribute1 = "'"+patientId.replace("'","\\'")+"'";
+							result = statement.executeQuery("SELECT * FROM Lab_Test_Report_Of WHERE LabTestResultId="+queryAttribute +" AND PatientId="+queryAttribute1);
 							if(result.next()) {
 								insertOrUpdateLabTestReport(labTestReport, connHealth, false);
 							}
 							else {
 								insertOrUpdateLabTestReport(labTestReport, connHealth, true);
 							}
-							
+
 						}
 
 						if(RelativeId!=null && patientId!=null) {
 							familyMember = new FamilyMember(RelativeId, age, Relation, Diagnosis, patientId);
-							
+
 							statement = connHealth.createStatement();
-							result = st.executeQuery("SELECT (*) FROM Family_Member_Of_Patient WHERE Id="+RelativeId + " AND PatientId="+patientId);
+							queryAttribute = "'"+RelativeId.replace("'","\\'")+"'";
+							queryAttribute1 = "'"+patientId.replace("'","\\'")+"'";
+							result = statement.executeQuery("SELECT * FROM Family_Member_Of_Patient WHERE Id="+queryAttribute + " AND PatientId="+queryAttribute1);
 							if(result.next()) {
 								insertOrUpdateFamilyMember(familyMember, connHealth, false);
 							}
@@ -369,9 +398,11 @@ public class Parser {
 
 						if(AuthorId!=null) {
 							author = new Author(AuthorId, AuthorFirstName, AuthorTitle, AuthorLastName);
-							
+
 							statement = connHealth.createStatement();
-							result = st.executeQuery("SELECT (*) FROM Author WHERE AuthorId="+AuthorId);
+							queryAttribute = "'"+AuthorId.replace("'","\\'")+"'";
+//							System.out.println("SELECT * FROM Author WHERE AuthorId="+AuthorId);
+							result = statement.executeQuery("SELECT * FROM Author WHERE AuthorId="+queryAttribute);
 							if(result.next()) {
 								insertOrUpdateAuthor(author, connHealth, false);
 							}
@@ -382,9 +413,11 @@ public class Parser {
 
 						if(AuthorId!=null && patientId!=null) {
 							assignedTo = new AssignedTo(AuthorId, patientId, ParticipatingRole);
-							
+
 							statement = connHealth.createStatement();
-							result = st.executeQuery("SELECT (*) FROM Assigned_To WHERE AuthorId="+AuthorId + " AND PatientId="+patientId);
+							queryAttribute = "'"+AuthorId.replace("'","\\'")+"'";
+							queryAttribute1 = "'"+patientId.replace("'","\\'")+"'";
+							result = statement.executeQuery("SELECT * FROM Assigned_To WHERE AuthorId="+queryAttribute + " AND PatientId="+queryAttribute1);
 							if(result.next()) {
 								insertOrUpdateAssignedTo(assignedTo, connHealth, false);
 							}
@@ -395,9 +428,10 @@ public class Parser {
 
 						if(Id!=null) {
 							substance = new Substance(Id, Substance);
-							
+
 							statement = connHealth.createStatement();
-							result = st.executeQuery("SELECT (*) FROM Substance WHERE SubstanceId="+Id);
+							queryAttribute = "'"+Id.replace("'","\\'")+"'";
+							result = statement.executeQuery("SELECT * FROM Substance WHERE SubstanceId="+queryAttribute);
 							if(result.next()) {
 								insertOrUpdateSubstance(substance, connHealth, false);
 							}
@@ -408,9 +442,11 @@ public class Parser {
 
 						if(Id!=null && patientId!=null) {
 							allergicTo = new AllergicTo(Reaction, Status, Id, patientId);
-							
+
 							statement = connHealth.createStatement();
-							result = st.executeQuery("SELECT (*) FROM Allergic_To WHERE SubstanceId="+Id + " AND PatientId="+patientId);
+							queryAttribute = "'"+Id.replace("'","\\'")+"'";
+							queryAttribute1 = "'"+patientId.replace("'","\\'")+"'";
+							result = statement.executeQuery("SELECT * FROM Allergic_To WHERE SubstanceId="+queryAttribute + " AND PatientId="+queryAttribute1);
 							if(result.next()) {
 								insertOrUpdateAllergicTo(allergicTo, connHealth, false);
 							}
@@ -421,9 +457,11 @@ public class Parser {
 
 						if(PlanId!=null && patientId!=null) {
 							planScheduledFor = new PlanScheduledFor(PlanId, Activity, patientId, ScheduledDate);
-							
+
 							statement = connHealth.createStatement();
-							result = st.executeQuery("SELECT (*) FROM Plan_Scheduled_For WHERE PlanId="+PlanId + " AND PatientId="+patientId);
+							queryAttribute = "'"+Id.replace("'","\\'")+"'";
+							queryAttribute1 = "'"+patientId.replace("'","\\'")+"'";
+							result = statement.executeQuery("SELECT * FROM Plan_Scheduled_For WHERE PlanId="+queryAttribute + " AND PatientId="+queryAttribute1);
 							if(result.next()) {
 								insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, false);
 							}
