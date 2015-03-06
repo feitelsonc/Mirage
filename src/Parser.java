@@ -290,7 +290,7 @@ public class Parser {
 						planScheduledFor = new PlanScheduledFor(PlanId, Activity, patientId, ScheduledDate);
 
 						statement = connHealth.createStatement();
-						queryAttribute = "'"+Id.replace("'","\\'")+"'";
+						queryAttribute = "'"+PlanId.replace("'","\\'")+"'";
 						queryAttribute1 = "'"+patientId.replace("'","\\'")+"'";
 						result = statement.executeQuery("SELECT * FROM Plan_Scheduled_For WHERE PlanId="+queryAttribute + " AND PatientId="+queryAttribute1);
 						if(result.next()) {
@@ -300,10 +300,22 @@ public class Parser {
 							insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, true);
 						}
 					}
+					
+					// update access time of messages table
+					String currMsgId = "'"+MsgId+"'";
+					String updateMessage = "UPDATE messages "
+							+ "SET Last_Accessed=" + accessTimeOfMessages + " "
+							+ "WHERE MsgId=" + currMsgId;
+					try {
+						executeUpdate(connMessage, updateMessage);
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
 
 				}
 				// either update tables in HealthInformationSystem's table because tuple in messages is more recent or ignore tuple if Last_Accessed time is older/equal to the patient's XmlHealthCreationDateTime
 				else {
+					
 					// get creation time of patient
 					String time;
 					Statement statement = connHealth.createStatement();;
@@ -469,21 +481,21 @@ public class Parser {
 								insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, true);
 							}
 						}
+						
+						// update access time of messages table
+						String currMsgId = "'"+MsgId+"'";
+						String updateMessage = "UPDATE messages "
+								+ "SET Last_Accessed=" + accessTimeOfMessages + " "
+								+ "WHERE MsgId=" + currMsgId;
+						try {
+							executeUpdate(connMessage, updateMessage);
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
 					}
 					else {
 						// do nothing because value in HealthInformationSystem is more recent than value in messages
 					}
-				}
-				
-				// update access time of messages table
-				String currMsgId = "'"+MsgId+"'";
-				String updateMessage = "UPDATE messages "
-						+ "SET Last_Accessed=" + accessTimeOfMessages + " "
-						+ "WHERE MsgId=" + currMsgId;
-				try {
-					executeUpdate(connMessage, updateMessage);
-				} catch (SQLException e) {
-					e.printStackTrace();
 				}
 				
 			}
@@ -533,6 +545,7 @@ public class Parser {
 		}
 		
 		if (isInsert){
+//			System.out.println("INSERTING Allergic To ENTRY");
 			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAllergicTo + " VALUES (" + Reaction + "," + Active + "," + SubstanceId + "," + PatientId + ")";
 //			System.out.println(insertMessage);
 			try {
@@ -542,6 +555,7 @@ public class Parser {
 			}
 		}
 		else {
+//			System.out.println("UPDATING Allergic To ENTRY");
 			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameAllergicTo + 
 					" SET Reaction=" + Reaction + " ," +
 					" Active=" + Active + " ," +
@@ -577,6 +591,7 @@ public class Parser {
 		}
 		
 		if (isInsert) {
+//			System.out.println("INSERTING Assigned To ENTRY");
 			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAssignedTo + " VALUES (" + AuthorId + "," + PatientId + "," + ParticipatingRole + ")";
 //			System.out.println(insertMessage);
 			try {
@@ -586,6 +601,7 @@ public class Parser {
 			}
 		}
 		else {
+//			System.out.println("UPDATING Assigned To ENTRY");
 			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameAssignedTo + 
 					" SET AuthorId=" + AuthorId + " ," +
 					" PatientId=" + PatientId + " ," +
@@ -625,6 +641,7 @@ public class Parser {
 		}
 		
 		if (isInsert) {
+//			System.out.println("INSERTING Author ENTRY");
 			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameAuthor + " VALUES (" + AuthorId + "," + AuthorFirstName + "," + AuthorTitle + "," + AuthorLastName + ")";
 //			System.out.println(insertMessage);
 			try {
@@ -634,6 +651,7 @@ public class Parser {
 			}
 		}
 		else {
+//			System.out.println("UPDATING Author ENTRY");
 			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameAuthor + 
 					" SET AuthorId=" + AuthorId + " ," +
 					" AuthorFirstName=" + AuthorFirstName + " ," +
@@ -678,6 +696,7 @@ public class Parser {
 		}
 		
 		if (isInsert) {
+//			System.out.println("INSERTING Family Member ENTRY");
 			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameFamilyMemberOfPatient + " VALUES (" + Id + "," + Age + "," + Relationship + "," + Diagnosis + "," + PatientId + ")";
 //			System.out.println(insertMessage);
 			try {
@@ -687,6 +706,7 @@ public class Parser {
 			}
 		}
 		else {
+//			System.out.println("UPDATING Family Member ENTRY");
 			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameFamilyMemberOfPatient + 
 					" SET Id=" + Id + " ," +
 					" Age=" + Age + " ," +
@@ -748,6 +768,7 @@ public class Parser {
 		}
 		
 		if (isInsert) {
+//			System.out.println("INSERTING Guardian ENTRY");
 			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameGuardian + " VALUES (" + GuardianNo + "," + Phone + "," + Address + "," + State + "," + GivenName + "," + FamilyName + "," + City + "," + Zip + ")";
 //			System.out.println(insertMessage);
 			try {
@@ -757,6 +778,7 @@ public class Parser {
 			}
 		}
 		else {
+//			System.out.println("UPDATING Guardian ENTRY");
 			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameGuardian + 
 					" SET GuardianNo=" + GuardianNo + " ," +
 					" Phone=" + Phone + " ," +
@@ -790,6 +812,7 @@ public class Parser {
 		}
 		
 		if (isInsert) {
+//			System.out.println("INSERTING Insurance ENTRY");
 			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameInsurance + " VALUES (" + PayerId + "," + Name + ")";
 //			System.out.println(insertMessage);
 			try {
@@ -799,6 +822,7 @@ public class Parser {
 			}
 		}
 		else {
+//			System.out.println("UPDATING Insurance ENTRY");
 			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameInsurance + 
 					" SET PayerId=" + PayerId + " ," +
 					" Name=" + Name +
@@ -856,6 +880,7 @@ public class Parser {
 		}
 		
 		if (isInsert) {
+//			System.out.println("INSERTING Lab Test Report Of ENTRY");
 			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameLabTestReportOf + " VALUES (" + LabTestResultId + "," + LabTestType + "," + ReferenceRangeHigh + "," + PatientVisitId + "," + LabTestPerformedDate + "," + TestResultValue + "," + ReferenceRangeLow + "," + PatientId + ")";
 //			System.out.println(insertMessage);
 			try {
@@ -865,6 +890,7 @@ public class Parser {
 			}
 		}
 		else {
+//			System.out.println("UPDATING Lab Test Report Of ENTRY");
 			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameLabTestReportOf + 
 					" SET LabTestResultId=" + LabTestResultId + " ," +
 					" LabTestType=" + LabTestType + " ," +
@@ -958,6 +984,7 @@ public class Parser {
 		}
 
 		if (isInsert) {
+//			System.out.println("INSERTING Patient ENTRY");
 			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNamePatient + " VALUES (" + PatientId + "," + FamilyName + "," + GivenName + "," + Suffix + "," + BirthTime + "," + Gender + "," + ProviderId + "," + xmlHealthCreationDateTime + "," + GuardianNo + "," + PayerId + "," + PatientRole + "," + PolicyType + "," + PolicyHolder + "," + Purpose + ")";
 //			System.out.println(insertMessage);
 			try {
@@ -967,6 +994,7 @@ public class Parser {
 			}
 		}
 		else {
+//			System.out.println("UPDATING Patient ENTRY");
 			String updateMessage = "UPDATE " + HealthInformationSystem.TableNamePatient + 
 					" SET PatientId=" + PatientId + " ," +
 					" FamilyName=" + FamilyName + " ," +
@@ -1016,6 +1044,7 @@ public class Parser {
 		}
 
 		if (isInsert) {
+//			System.out.println("INSERTING Plan Scheduled ENTRY");
 			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNamePlanScheduledFor + " VALUES (" + PlanId + "," + PlanName + "," + PatientId + "," + DateScheduled + ")";
 //			System.out.println(insertMessage);
 			try {
@@ -1025,6 +1054,7 @@ public class Parser {
 			}
 		}
 		else {
+//			System.out.println("UPDATING Plan Scheduled For ENTRY");
 			String updateMessage = "UPDATE " + HealthInformationSystem.TableNamePlanScheduledFor + 
 					" SET PlanId=" + PlanId + " ," +
 					" PlanName=" + PlanName + " ," +
@@ -1054,6 +1084,7 @@ public class Parser {
 		}
 		
 		if (isInsert) {
+//			System.out.println("INSERTING Substance ENTRY");
 			String insertMessage = "INSERT INTO " + HealthInformationSystem.TableNameSubstance + " VALUES (" + SubstanceId + "," + SubstanceName + ")";
 //			System.out.println(insertMessage);
 			try {
@@ -1063,6 +1094,7 @@ public class Parser {
 			}
 		}
 		else {
+//			System.out.println("UPDATING Substance ENTRY");
 			String updateMessage = "UPDATE " + HealthInformationSystem.TableNameSubstance + 
 					" SET SubstanceId=" + SubstanceId + " ," +
 					" SubstanceName=" + SubstanceName +
