@@ -6,6 +6,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Properties;
 
 
@@ -93,6 +95,7 @@ public class InterfaceManager {
 					processAdminOp2(con);
 				}
 				else if (in.equals("3") || in.equals("(3)")) {
+					processAdminOp3(con);
 					invalidInput = false;
 				}
 				else if (in.equals("4") || in.equals("(4)")) {
@@ -174,6 +177,85 @@ public class InterfaceManager {
 			
 			if (count == 0) {
 				System.out.println("No patients have more than one allergy");
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+private static void processAdminOp3(Connection con) {
+	
+		System.out.println("Enter plan name to search for");
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		String planName = "";
+		try {
+			planName = br.readLine();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		String pn = planName;
+		planName = "'"+planName.replace("'","\\'")+"'";
+		String PlanDate;
+		String GivenName;
+		String FamilyName;
+		String recievedData = new String();
+		
+		Date today = new Date();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(today);
+		int todayYear = cal.get(Calendar.YEAR);
+		int todayMonth = cal.get(Calendar.MONDAY) + 1;
+		int todayDay = cal.get(Calendar.DAY_OF_MONTH);
+		int planYear;
+		int planMonth;
+		int planDay;
+		String[] data;
+		String newDay;
+		String newMonth;
+		String newYear;
+		
+		try {
+			Statement st = null;
+			ResultSet rs = null;
+			
+			String query =
+					"SELECT DISTINCT A.DateScheduled, P.GivenName, P.FamilyName " +
+					"FROM Patient P, Plan_Scheduled_For A " +
+					"WHERE P.patientId = A.patientId AND A.PlanName=" + planName;
+			st = con.createStatement();
+			rs = st.executeQuery(query);
+			
+			int count = 0;
+			while(rs.next()) {
+				GivenName = rs.getString("GivenName");
+				FamilyName = rs.getString("FamilyName");
+				PlanDate = rs.getString("DateScheduled");
+				
+				recievedData = PlanDate;
+				data = recievedData.split("/", 3);
+				newMonth = data[0];
+				newDay = data[1];
+				data = data[2].split(" ", 2);
+				newYear = data[0];
+				
+				planYear = Integer.parseInt(newYear);
+				planMonth = Integer.parseInt(newMonth);
+				planDay = Integer.parseInt(newDay);
+				
+				if (PlanDate == null) {
+					continue;
+				}
+				
+				if (todayYear==planYear && todayMonth==planMonth && todayDay==planDay) {
+					++count;
+					System.out.println(GivenName + " " + FamilyName + " is planned for " + pn + " today");
+				}
+			}
+			
+			if (count == 0) {
+				System.out.println("There are no patients who are scheduled for " + pn + " today");
 			}
 			
 		} catch (SQLException e) {
