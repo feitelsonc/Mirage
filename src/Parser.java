@@ -146,55 +146,141 @@ public class Parser {
 				// insert entire tuple from messages into HealthInformationSystem's table because tuple is new
 				if (Last_Accessed == null) {
 					
+					Statement statement = connMessage.createStatement();
+					ResultSet result = null;
+					
 					if(PayerId!=null) {
 						insurance = new Insurance(PayerId, Name);
-						st = connHealth.createStatement();
-						insertOrUpdateInsurance(insurance, connHealth, true);
+						
+						statement = connHealth.createStatement();
+						result = st.executeQuery("SELECT (*) FROM Insurance WHERE PayerId="+PayerId);
+						if(result.next()) {
+							insertOrUpdateInsurance(insurance, connHealth, false);
+
+						}
+						else {
+							insertOrUpdateInsurance(insurance, connHealth, true);
+						}
 					}
 
 					if(GuardianNo!=null) {
 						guardian = new Guardian(GuardianNo, phone, address, state, FirstName, LastName, city, zip);	
-						insertOrUpdateGuardian(guardian, connHealth, true);
+						
+						statement = connHealth.createStatement();
+						result = st.executeQuery("SELECT (*) FROM Guardian WHERE GuardianNo="+GuardianNo);
+						if(result.next()) {
+							insertOrUpdateGuardian(guardian, connHealth, false);
+						}
+						else {
+							insertOrUpdateGuardian(guardian, connHealth, true);
+						}
+						
 					}
 
 					if(patientId!=null && GuardianNo!=null && PayerId!=null) {
 						patient = new Patient(patientId, FamilyName, GivenName, null, BirthTime, null, providerId, accessTimeOfMessages, GuardianNo, PayerId, Relationship, PolicyType, PolicyHolder, Purpose);
-						insertOrUpdatePatient(patient, connHealth, true);
+						
+						statement = connHealth.createStatement();
+						result = st.executeQuery("SELECT (*) FROM Patient WHERE PatientId="+patientId);
+						
+						if(result.next()) {
+							insertOrUpdatePatient(patient, connHealth, false);
+						}
+						else {
+							insertOrUpdatePatient(patient, connHealth, true);
+						}
 					}
 
 					if(LabTestResultId!=null && patientId!=null) {
 						labTestReport = new LabTestReport(LabTestResultId, LabTestType, ReferenceRangeHigh, PatientVisitId, LabTestPerformedDate, TestResultValue, ReferenceRangeLow, patientId);
-						insertOrUpdateLabTestReport(labTestReport, connHealth, true);
+						
+						statement = connHealth.createStatement();
+						result = st.executeQuery("SELECT (*) FROM Lab_Test_Report_Of WHERE LabTestResultId="+LabTestResultId +" AND PatientId="+patientId);
+						if(result.next()) {
+							insertOrUpdateLabTestReport(labTestReport, connHealth, false);
+						}
+						else {
+							insertOrUpdateLabTestReport(labTestReport, connHealth, true);
+						}
+						
 					}
 
 					if(RelativeId!=null && patientId!=null) {
 						familyMember = new FamilyMember(RelativeId, age, Relation, Diagnosis, patientId);
-						insertOrUpdateFamilyMember(familyMember, connHealth, true);
+						
+						statement = connHealth.createStatement();
+						result = st.executeQuery("SELECT (*) FROM Family_Member_Of_Patient WHERE Id="+RelativeId + " AND PatientId="+patientId);
+						if(result.next()) {
+							insertOrUpdateFamilyMember(familyMember, connHealth, false);
+						}
+						else {
+							insertOrUpdateFamilyMember(familyMember, connHealth, true);
+						}
 					}
 
 					if(AuthorId!=null) {
 						author = new Author(AuthorId, AuthorFirstName, AuthorTitle, AuthorLastName);
-						insertOrUpdateAuthor(author, connHealth, true);
+						
+						statement = connHealth.createStatement();
+						result = st.executeQuery("SELECT (*) FROM Author WHERE AuthorId="+AuthorId);
+						if(result.next()) {
+							insertOrUpdateAuthor(author, connHealth, false);
+						}
+						else {
+							insertOrUpdateAuthor(author, connHealth, true);
+						}
 					}
 
 					if(AuthorId!=null && patientId!=null) {
 						assignedTo = new AssignedTo(AuthorId, patientId, ParticipatingRole);
-						insertOrUpdateAssignedTo(assignedTo, connHealth, true);
+						
+						statement = connHealth.createStatement();
+						result = st.executeQuery("SELECT (*) FROM Assigned_To WHERE AuthorId="+AuthorId + " AND PatientId="+patientId);
+						if(result.next()) {
+							insertOrUpdateAssignedTo(assignedTo, connHealth, false);
+						}
+						else {
+							insertOrUpdateAssignedTo(assignedTo, connHealth, true);
+						}
 					}
 
 					if(Id!=null) {
 						substance = new Substance(Id, Substance);
-						insertOrUpdateSubstance(substance, connHealth, true);
+						
+						statement = connHealth.createStatement();
+						result = st.executeQuery("SELECT (*) FROM Substance WHERE SubstanceId="+Id);
+						if(result.next()) {
+							insertOrUpdateSubstance(substance, connHealth, false);
+						}
+						else {
+							insertOrUpdateSubstance(substance, connHealth, true);
+						}
 					}
 
 					if(Id!=null && patientId!=null) {
 						allergicTo = new AllergicTo(Reaction, Status, Id, patientId);
-						insertOrUpdateAllergicTo(allergicTo, connHealth, true);
+						
+						statement = connHealth.createStatement();
+						result = st.executeQuery("SELECT (*) FROM Allergic_To WHERE SubstanceId="+Id + " AND PatientId="+patientId);
+						if(result.next()) {
+							insertOrUpdateAllergicTo(allergicTo, connHealth, false);
+						}
+						else {
+							insertOrUpdateAllergicTo(allergicTo, connHealth, true);
+						}
 					}
 
 					if(PlanId!=null && patientId!=null) {
 						planScheduledFor = new PlanScheduledFor(PlanId, Activity, patientId, ScheduledDate);
-						insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, true);
+						
+						statement = connHealth.createStatement();
+						result = st.executeQuery("SELECT (*) FROM Plan_Scheduled_For WHERE PlanId="+PlanId + " AND PatientId="+patientId);
+						if(result.next()) {
+							insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, false);
+						}
+						else {
+							insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, true);
+						}
 					}
 					
 				}
@@ -204,60 +290,146 @@ public class Parser {
 					String time;
 					Statement statement = connMessage.createStatement();;
 					ResultSet result = null;
-					result = statement.executeQuery("SELECT xmlHealthCreationDateTime FROM Patient WHERE PatientId="+patientId+";");
-					result.next();
-					time= result.getString("xmlHealthCreationDateTime");
-
+					result = statement.executeQuery("SELECT xmlHealthCreationDateTime FROM Patient WHERE PatientId="+patientId);
+					boolean patientAlreadyExists = result.next();
+					
+					if (patientAlreadyExists) {
+						time= result.getString("xmlHealthCreationDateTime");
+					}
+					else {
+						time= "0";
+					}
+					
 					if(Long.valueOf(Last_Accessed).longValue() > Long.valueOf(time).longValue()) {
 						if(PayerId!=null) {
 							insurance = new Insurance(PayerId, Name);
-							st = connHealth.createStatement();
-							insertOrUpdateInsurance(insurance, connHealth, false);
+							
+							statement = connHealth.createStatement();
+							result = st.executeQuery("SELECT (*) FROM Insurance WHERE PayerId="+PayerId);
+							if(result.next()) {
+								insertOrUpdateInsurance(insurance, connHealth, false);
+
+							}
+							else {
+								insertOrUpdateInsurance(insurance, connHealth, true);
+							}
 						}
 
 						if(GuardianNo!=null) {
 							guardian = new Guardian(GuardianNo, phone, address, state, FirstName, LastName, city, zip);	
-							insertOrUpdateGuardian(guardian, connHealth, false);
+							
+							statement = connHealth.createStatement();
+							result = st.executeQuery("SELECT (*) FROM Guardian WHERE GuardianNo="+GuardianNo);
+							if(result.next()) {
+								insertOrUpdateGuardian(guardian, connHealth, false);
+							}
+							else {
+								insertOrUpdateGuardian(guardian, connHealth, true);
+							}
+							
 						}
 
 						if(patientId!=null && GuardianNo!=null && PayerId!=null) {
 							patient = new Patient(patientId, FamilyName, GivenName, null, BirthTime, null, providerId, accessTimeOfMessages, GuardianNo, PayerId, Relationship, PolicyType, PolicyHolder, Purpose);
-							insertOrUpdatePatient(patient, connHealth, false);
+
+							if(patientAlreadyExists) {
+								insertOrUpdatePatient(patient, connHealth, false);
+							}
+							else {
+								insertOrUpdatePatient(patient, connHealth, true);
+							}
 						}
 
 						if(LabTestResultId!=null && patientId!=null) {
 							labTestReport = new LabTestReport(LabTestResultId, LabTestType, ReferenceRangeHigh, PatientVisitId, LabTestPerformedDate, TestResultValue, ReferenceRangeLow, patientId);
-							insertOrUpdateLabTestReport(labTestReport, connHealth, false);
+							
+							statement = connHealth.createStatement();
+							result = st.executeQuery("SELECT (*) FROM Lab_Test_Report_Of WHERE LabTestResultId="+LabTestResultId +" AND PatientId="+patientId);
+							if(result.next()) {
+								insertOrUpdateLabTestReport(labTestReport, connHealth, false);
+							}
+							else {
+								insertOrUpdateLabTestReport(labTestReport, connHealth, true);
+							}
+							
 						}
 
 						if(RelativeId!=null && patientId!=null) {
 							familyMember = new FamilyMember(RelativeId, age, Relation, Diagnosis, patientId);
-							insertOrUpdateFamilyMember(familyMember, connHealth, false);
+							
+							statement = connHealth.createStatement();
+							result = st.executeQuery("SELECT (*) FROM Family_Member_Of_Patient WHERE Id="+RelativeId + " AND PatientId="+patientId);
+							if(result.next()) {
+								insertOrUpdateFamilyMember(familyMember, connHealth, false);
+							}
+							else {
+								insertOrUpdateFamilyMember(familyMember, connHealth, true);
+							}
 						}
 
 						if(AuthorId!=null) {
 							author = new Author(AuthorId, AuthorFirstName, AuthorTitle, AuthorLastName);
-							insertOrUpdateAuthor(author, connHealth, false);
+							
+							statement = connHealth.createStatement();
+							result = st.executeQuery("SELECT (*) FROM Author WHERE AuthorId="+AuthorId);
+							if(result.next()) {
+								insertOrUpdateAuthor(author, connHealth, false);
+							}
+							else {
+								insertOrUpdateAuthor(author, connHealth, true);
+							}
 						}
 
 						if(AuthorId!=null && patientId!=null) {
 							assignedTo = new AssignedTo(AuthorId, patientId, ParticipatingRole);
-							insertOrUpdateAssignedTo(assignedTo, connHealth, false);
+							
+							statement = connHealth.createStatement();
+							result = st.executeQuery("SELECT (*) FROM Assigned_To WHERE AuthorId="+AuthorId + " AND PatientId="+patientId);
+							if(result.next()) {
+								insertOrUpdateAssignedTo(assignedTo, connHealth, false);
+							}
+							else {
+								insertOrUpdateAssignedTo(assignedTo, connHealth, true);
+							}
 						}
 
 						if(Id!=null) {
 							substance = new Substance(Id, Substance);
-							insertOrUpdateSubstance(substance, connHealth, false);
+							
+							statement = connHealth.createStatement();
+							result = st.executeQuery("SELECT (*) FROM Substance WHERE SubstanceId="+Id);
+							if(result.next()) {
+								insertOrUpdateSubstance(substance, connHealth, false);
+							}
+							else {
+								insertOrUpdateSubstance(substance, connHealth, true);
+							}
 						}
 
 						if(Id!=null && patientId!=null) {
 							allergicTo = new AllergicTo(Reaction, Status, Id, patientId);
-							insertOrUpdateAllergicTo(allergicTo, connHealth, false);
+							
+							statement = connHealth.createStatement();
+							result = st.executeQuery("SELECT (*) FROM Allergic_To WHERE SubstanceId="+Id + " AND PatientId="+patientId);
+							if(result.next()) {
+								insertOrUpdateAllergicTo(allergicTo, connHealth, false);
+							}
+							else {
+								insertOrUpdateAllergicTo(allergicTo, connHealth, true);
+							}
 						}
 
 						if(PlanId!=null && patientId!=null) {
 							planScheduledFor = new PlanScheduledFor(PlanId, Activity, patientId, ScheduledDate);
-							insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, false);
+							
+							statement = connHealth.createStatement();
+							result = st.executeQuery("SELECT (*) FROM Plan_Scheduled_For WHERE PlanId="+PlanId + " AND PatientId="+patientId);
+							if(result.next()) {
+								insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, false);
+							}
+							else {
+								insertOrUpdatePlanScheduledFor(planScheduledFor, connHealth, true);
+							}
 						}
 					}
 					else {
