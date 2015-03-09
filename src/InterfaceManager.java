@@ -64,6 +64,57 @@ public class InterfaceManager {
 
 	private static void patientInterface(Connection con) {
 		System.out.println("Entering patient mode.");
+		System.out.println("Enter your patient ID.");
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		String in = "";
+		String patientId = "";
+		boolean isValidId = false;
+		while (!isValidId) {
+			try {
+				in = br.readLine();
+				patientId = in;
+				isValidId = checkIsValidPatientId(patientId, con);
+				
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			if (!isValidId) {
+				if (in.toLowerCase().equals("exit")) {
+					return;
+				}
+				System.out.println("ID is not a valid patient ID. Try again or enter \"exit\" to quit.");	
+			}
+		}
+		
+		boolean quit = false;
+		try {
+			while (!quit) {
+				System.out.println("Enter (1) to view all of your data");
+				System.out.println("Enter (2) to edit your data");
+				System.out.println("Enter (3) to logout");
+
+				in = br.readLine();
+
+				if (in.equals("1")) {
+					quit = false;
+					processPatientOp1(con, patientId);
+				}
+				else if (in.equals("2")) {
+					quit = false;
+//					processPatientOp2(con, patientId);
+				}
+				else if (in.equals("3") || in.toLowerCase().equals("logout")) {
+					System.out.println("Logout out");
+					quit = true;
+				}
+				else {
+					quit = false;
+					System.out.println(errorString);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -310,6 +361,352 @@ public class InterfaceManager {
 		}
 
 	}
+	
+	private static boolean checkIsValidPatientId(String id, Connection con) {
+		
+		try {
+			Statement st = null;
+			ResultSet rs = null;
 
+			String query =
+					"SELECT * " +
+					"FROM Patient " +
+					"WHERE PatientId = " + id;
+
+			st = con.createStatement();
+			rs = st.executeQuery(query);
+
+			return rs.next();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+		
+	}
+	
+	private static void processPatientOp1(Connection con, String patientID) {
+
+		try {
+			Statement st = null;
+			ResultSet rs = null;
+			
+			// patient table
+			
+			String query =
+					"SELECT * " +
+					"FROM Patient " +
+					"WHERE PatientId = " + patientID;
+
+			st = con.createStatement();
+			rs = st.executeQuery(query);
+			rs.next();
+
+			String PatientId = patientID;
+			String FamilyName = rs.getString("FamilyName");
+			String GivenName = rs.getString("GivenName");
+			String Suffix = rs.getString("Suffix");
+			String BirthTime = rs.getString("BirthTime");
+			String Gender = rs.getString("Gender");
+			String ProviderId = rs.getString("ProviderId");
+			String xmlHealthCreationDateTime = rs.getString("xmlHealthCreationDateTime");
+			String GuardianNo = rs.getString("GuardianNo");
+			String PayerId = rs.getString("PayerId");
+			String PatientRole = rs.getString("PatientRole");
+			String PolicyType = rs.getString("PolicyType");
+			String PolicyHolder = rs.getString("PolicyHolder");
+			String Purpose = rs.getString("Purpose");
+			
+			Patient patient = new Patient(PatientId, FamilyName, GivenName, null, BirthTime, null, ProviderId, xmlHealthCreationDateTime, GuardianNo, PayerId, PatientRole, PolicyType, PolicyHolder, Purpose);
+			
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~Patient Data~~~~~~~~~~~~~~~~~~~~~");
+			String colPrint = "";
+			String valPrint = "";
+			if (patient.PatientId != null) {
+				colPrint = "PatientId";
+				valPrint = PatientId;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (patient.GivenName != null) {
+				colPrint = "GivenName";
+				valPrint = GivenName;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (patient.FamilyName != null) {
+				colPrint = "FamilyName";
+				valPrint = FamilyName;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (patient.Suffix != null) {
+				colPrint = "Suffix";
+				valPrint = Suffix;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (patient.BirthTime != null) {
+				colPrint = "BirthTime";
+				valPrint = BirthTime;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (patient.Gender != null) {
+				colPrint = "Gender";
+				valPrint = Gender;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (patient.ProviderId != null) {
+				colPrint = "ProviderId";
+				valPrint = ProviderId;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (patient.xmlHealthCreationDateTime != null) {
+				colPrint = "xmlHealthCreationDateTime";
+				valPrint = xmlHealthCreationDateTime;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (patient.GuardianNo != null) {
+				colPrint = "GuardianNo";
+				valPrint = GuardianNo;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (patient.PayerId != null) {
+				colPrint = "PayerId";
+				valPrint = PayerId;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (patient.PatientRole != null) {
+				colPrint = "PatientRole";
+				valPrint = PatientRole;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (patient.PolicyType != null) {
+				colPrint = "PolicyType";
+				valPrint = PolicyType;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (patient.PolicyHolder != null) {
+				colPrint = "PolicyHolder";
+				valPrint = PolicyHolder;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (patient.Purpose != null) {
+				colPrint = "Purpose";
+				valPrint = Purpose;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			
+			// guardian table
+			
+			query =
+				"SELECT * " +
+				"FROM Guardian G, Patient P " +
+				"WHERE G.GuardianNo = " + GuardianNo;
+
+			st = con.createStatement();
+			rs = st.executeQuery(query);
+			rs.next();
+
+			String Phone = rs.getString("Phone");
+			String Address = rs.getString("Address");
+			String State = rs.getString("State");
+			String GGivenName = rs.getString("GivenName");
+			String GFamilyName = rs.getString("FamilyName");
+			String City = rs.getString("City");
+			String Zip = rs.getString("Zip");
+			
+			Guardian guardian = new Guardian(GuardianNo, Phone, Address, State, GGivenName, GFamilyName, City, Zip);
+			
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~Guardian Data~~~~~~~~~~~~~~~~~~~~~");
+			colPrint = "";
+			valPrint = "";
+			if (guardian.GuardianNo != null) {
+				colPrint = "GuardianNo";
+				valPrint = GuardianNo;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (guardian.Phone != null) {
+				colPrint = "Phone";
+				valPrint = Phone;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (guardian.Address != null) {
+				colPrint = "Address";
+				valPrint = Address;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (guardian.State != null) {
+				colPrint = "State";
+				valPrint = State;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (guardian.GivenName != null) {
+				colPrint = "GivenName";
+				valPrint = GGivenName;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (guardian.FamilyName != null) {
+				colPrint = "FamilyName";
+				valPrint = GFamilyName;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (guardian.City != null) {
+				colPrint = "City";
+				valPrint = City;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (guardian.Zip != null) {
+				colPrint = "Zip";
+				valPrint = Zip;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			
+			// insurance table
+			
+			query =
+				"SELECT * " +
+				"FROM Insurance I, Patient P " +
+				"WHERE I.PayerId = " + PayerId;
+
+			st = con.createStatement();
+			rs = st.executeQuery(query);
+			rs.next();
+
+			String Name = rs.getString("Name");
+			Insurance insurance = new Insurance(PayerId, Name);
+			
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~Insurance Data~~~~~~~~~~~~~~~~~~~~~");
+			if (insurance.PayerId != null) {
+				colPrint = "PayerId";
+				valPrint = PayerId;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			if (insurance.Name != null) {
+				colPrint = "Name";
+				valPrint = Name;
+				System.out.println(colPrint + ": " + valPrint);
+			}
+			
+			// lab test table
+			
+			query =
+				"SELECT * " +
+				"FROM Lab_Test_Report_Of L, Patient P " +
+				"WHERE L.PatientId = " + PatientId;
+
+			st = con.createStatement();
+			rs = st.executeQuery(query);
+			
+			String LabTestResultId = "";
+			String LabTestType = "";
+			String ReferenceRangeHigh = "";
+			String PatientVisitId = "";
+			String LabTestPerformedDate = "";
+			String TestResultValue = "";
+			String ReferenceRangeLow = "";
+			
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~Lab Test Data~~~~~~~~~~~~~~~~~~~~~");
+			int count = 1;
+			LabTestReport labTestReport;
+			while(rs.next()) {
+				System.out.println("~~~~~~~~~Test " + Integer.valueOf(count).toString() + "~~~~~~~~~");
+				LabTestResultId = rs.getString("LabTestResultId");
+				LabTestType = rs.getString("LabTestType");
+				ReferenceRangeHigh = rs.getString("ReferenceRangeHigh");
+				PatientVisitId = rs.getString("PatientVisitId");
+				LabTestPerformedDate = rs.getString("LabTestPerformedDate");
+				TestResultValue = rs.getString("TestResultValue");
+				ReferenceRangeLow = rs.getString("ReferenceRangeLow");
+				
+				labTestReport = new LabTestReport(LabTestResultId, LabTestType, ReferenceRangeHigh, PatientVisitId, LabTestPerformedDate, TestResultValue, ReferenceRangeLow, PatientId);
+				
+				if (labTestReport.LabTestResultId != null) {
+					colPrint = "LabTestResultId";
+					valPrint = LabTestResultId;
+					System.out.println(colPrint + ": " + valPrint);
+				}
+				if (labTestReport.LabTestType != null) {
+					colPrint = "LabTestType";
+					valPrint = LabTestType;
+					System.out.println(colPrint + ": " + valPrint);
+				}
+				if (labTestReport.ReferenceRangeHigh != null) {
+					colPrint = "ReferenceRangeHigh";
+					valPrint = ReferenceRangeHigh;
+					System.out.println(colPrint + ": " + valPrint);
+				}
+				if (labTestReport.PatientVisitId != null) {
+					colPrint = "PatientVisitId";
+					valPrint = PatientVisitId;
+					System.out.println(colPrint + ": " + valPrint);
+				}
+				if (labTestReport.LabTestPerformedDate != null) {
+					colPrint = "LabTestPerformedDate";
+					valPrint = LabTestPerformedDate;
+					System.out.println(colPrint + ": " + valPrint);
+				}
+				if (labTestReport.TestResultValue != null) {
+					colPrint = "TestResultValue";
+					valPrint = TestResultValue;
+					System.out.println(colPrint + ": " + valPrint);
+				}
+				if (labTestReport.ReferenceRangeLow != null) {
+					colPrint = "ReferenceRangeLow";
+					valPrint = ReferenceRangeLow;
+					System.out.println(colPrint + ": " + valPrint);
+				}
+				if (labTestReport.PatientId != null) {
+					colPrint = "PatientId";
+					valPrint = PatientId;
+					System.out.println(colPrint + ": " + valPrint);
+				}
+				++count;
+			}
+			
+			if (count == 1) {
+				System.out.println("No lab test data");
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	private static void processPatientOp2(Connection con) {
+
+		try {
+			Statement st = null;
+			ResultSet rs = null;
+			String patientId;
+			String GivenName;
+			String FamilyName;
+
+			String query =
+					"SELECT DISTINCT P.patientId, P.GivenName, P.FamilyName " +
+					"FROM Patient P, Allergic_To A " +
+					"WHERE P.patientId = A.patientId " +
+					"GROUP BY P.patientId " +
+					"HAVING COUNT(*)>1";
+
+			st = con.createStatement();
+			rs = st.executeQuery(query);
+
+			int count = 0;
+			while(rs.next()) {
+				++count;
+				patientId = rs.getString("patientId");
+				GivenName = rs.getString("GivenName");
+				FamilyName = rs.getString("FamilyName");
+
+				System.out.println(GivenName + " " + FamilyName + " has more than one allergy");	
+			}
+
+			if (count == 0) {
+				System.out.println("No patients have more than one allergy");
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
 
 }
