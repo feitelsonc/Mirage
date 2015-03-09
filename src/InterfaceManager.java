@@ -63,7 +63,7 @@ public class InterfaceManager {
 	}
 
 	private static void patientInterface(Connection con) {
-		System.out.println("Entering patient mode.");
+//		System.out.println("Entering patient mode.");
 		System.out.println("Enter your patient ID.");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		String in = "";
@@ -104,7 +104,7 @@ public class InterfaceManager {
 //					processPatientOp2(con, patientId);
 				}
 				else if (in.equals("3") || in.toLowerCase().equals("logout")) {
-					System.out.println("Logout out");
+					System.out.println("Logged out");
 					quit = true;
 				}
 				else {
@@ -124,7 +124,7 @@ public class InterfaceManager {
 	}
 
 	private static void administratorInterface(Connection con) {
-		System.out.println("Entering administrator mode.");
+//		System.out.println("Entering administrator mode.");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		String in;
 		boolean quit = false;
@@ -155,7 +155,7 @@ public class InterfaceManager {
 					processAdminOp4(con);
 				}
 				else if (in.equals("5") || in.toLowerCase().equals("logout")) {
-					System.out.println("Logout out");
+					System.out.println("Logged out");
 					quit = true;
 				}
 				else {
@@ -588,8 +588,8 @@ public class InterfaceManager {
 			
 			query =
 				"SELECT * " +
-				"FROM Lab_Test_Report_Of L, Patient P " +
-				"WHERE L.PatientId = " + PatientId;
+				"FROM Lab_Test_Report_Of " +
+				"WHERE PatientId = " + PatientId;
 
 			st = con.createStatement();
 			rs = st.executeQuery(query);
