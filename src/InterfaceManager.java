@@ -445,6 +445,44 @@ public class InterfaceManager {
 		
 	}
 	
+	private static boolean checkIsValidSubstanceId(String patientId, String substanceId, Connection con) {
+		
+		try {
+			Statement st = null;
+			ResultSet rs = null;
+
+			String query = "SELECT * FROM Allergic_To WHERE SubstanceId = " + substanceId + " AND PatientId = " + patientId;
+
+			st = con.createStatement();
+			rs = st.executeQuery(query);
+
+			return rs.next();
+
+		} catch (SQLException e) {
+			return false;
+		}
+		
+	}
+	
+	private static boolean checkIsValidPlanId(String patientId, String planId, Connection con) {
+
+		try {
+			Statement st = null;
+			ResultSet rs = null;
+
+			String query = "SELECT * FROM Plan_Scheduled_For WHERE PlanId = " + planId + " AND PatientId = " + patientId;
+
+			st = con.createStatement();
+			rs = st.executeQuery(query);
+
+			return rs.next();
+
+		} catch (SQLException e) {
+			return false;
+		}
+
+	}
+	
 	private static void processPatientOp1(Connection con, String patientID) {
 
 		try {
@@ -1421,38 +1459,29 @@ public class InterfaceManager {
 		boolean quit = false;
 		try {
 			
-			while (!quit) {
-				query = "SELECT * FROM Plan_Scheduled_For WHERE PlanId = " + planId + " AND PatientId = " + patientId;
-				try {
-					st = con.createStatement();
-					rs = st.executeQuery(query);
-
-					if (!rs.next()) {
-						quit = false;
-						System.out.println("Invalid Plan Id for Patient Id. Please Try Again or type \"exit\" to exit");
-						in = br.readLine();
-						if (in.toLowerCase().equals("exit"))
-						{
-							return;
-						}
-						planId = in;
-					}
-					else {
-						quit = true;
-					}
-				} catch (SQLException e) {
-					e.printStackTrace();
+			boolean isValidId = false;
+			
+			while (!isValidId) {
+				if (planId.toLowerCase().equals("exit")) {
+					return;
 				}
 				
+				isValidId = checkIsValidPlanId(patientId, planId, con);
+				if (!isValidId) {
+					System.out.println(planId + " is not a valid plan ID. Try again or enter \"exit\" to quit.");
+					try {
+						in = br.readLine();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					planId = in;
+				}
 			}
-			
-			quit = false;
 			
 			while (!quit) {
 				System.out.println("Enter (1) to edit Plan Name");
 				System.out.println("Enter (2) to edit Date Scheduled");
 				System.out.println("Enter (3) to exit");
-				// TODO: Maybe add delete option
 
 				in = br.readLine();
 
@@ -1525,41 +1554,32 @@ public class InterfaceManager {
 		ResultSet rs;
 		String query;
 		boolean quit = false;
-		try {
-			while (!quit) {
-				query = "SELECT * FROM Allergic_To WHERE SubstanceId = " + substanceId + " AND PatientId = " + patientId;
-				try {
-					st = con.createStatement();
-					rs = st.executeQuery(query);
-
-					if (!rs.next()) {
-						quit = false;
-						System.out.println("Invalid Substance Id for Patient Id. Please Try Again or type \"exit\" to exit");
-						in = br.readLine();
-						if (in.toLowerCase().equals("exit"))
-						{
-							return;
-						}
-						substanceId = in;
-					}
-					else {
-						quit = true;
-					}
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-				
+		boolean isValidId = false;
+		
+		while (!isValidId) {
+			if (substanceId.toLowerCase().equals("exit")) {
+				return;
 			}
 			
-			quit = false;
-			
+			isValidId = checkIsValidSubstanceId(patientId, substanceId, con);
+			if (!isValidId) {
+				System.out.println(substanceId + " is not a valid substance ID. Try again or enter \"exit\" to quit.");
+				try {
+					in = br.readLine();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				substanceId = in;
+			}
+		}
+		
+		try {
 			
 			while (!quit) {
 				System.out.println("Enter (1) to edit Reaction");
 				System.out.println("Enter (2) to edit Active");
 				System.out.println("Enter (3) to edit SubstanceName");
 				System.out.println("Enter (4) to exit");
-				// TODO: Maybe add delete option
 				
 				in = br.readLine();
 
