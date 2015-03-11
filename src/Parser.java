@@ -24,7 +24,7 @@ public class Parser {
 					connectionProps);
 
 			connMessage = DriverManager.getConnection("jdbc:mysql://"
-					+ HealthInformationSystem.serverName + ":" + HealthInformationSystem.portNumber + "/" + "healthmessagesexchange",
+					+ HealthInformationSystem.serverName + ":" + HealthInformationSystem.portNumber + "/" + "healthmessagesexchange3",
 					connectionProps);
 
 
@@ -90,7 +90,7 @@ public class Parser {
 
 			st = connMessage.createStatement();
 
-			rs = st.executeQuery("SELECT * FROM messages;");
+			rs = st.executeQuery("SELECT * FROM messages2;");
 
 			while(rs.next()) {
 
@@ -507,7 +507,7 @@ public class Parser {
 	}
 	
 	// Method to execute a SQL statement
-	private static boolean executeUpdate(Connection conn, String command) throws SQLException {
+	public static boolean executeUpdate(Connection conn, String command) throws SQLException {
 		Statement stmt = null;
 		try {
 			stmt = conn.createStatement();
